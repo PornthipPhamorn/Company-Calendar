@@ -212,6 +212,13 @@ a.ol:focus-visible{outline:2px solid #0092BD;outline-offset:2px}
 .sign-date{display:none!important}
 .sign-approved{font-weight:600;font-size:15px;line-height:1.5;color:var(--ink);text-align:center;max-width:540px}
 .sign-approved .th{display:block;font-size:16px;color:var(--ink-soft);font-weight:600}
+/* QR above, larger and centred in the right column; approval sentence lives in the footer */
+.sign-approved{display:none!important}
+.sign .qr{display:flex!important;flex-direction:column;align-items:center;gap:10px;margin-top:0}
+.sign .qr svg{width:200px!important;height:200px!important;border-radius:6px}
+.sign .qr span{text-align:center;font-size:14px;font-weight:600;color:var(--ink-soft)}
+.sign .qr span b{font-size:16px;color:var(--ink)}
+footer .wrap{grid-template-columns:1fr!important}
 </style>
 
 <header class="band">
@@ -269,6 +276,7 @@ a.ol:focus-visible{outline:2px solid #0092BD;outline-offset:2px}
         <div class="sign-date">Date: <span class="blank"></span></div>
         <div class="sign-stamp" id="signStamp"></div>
         <div class="sign-approved" id="signApproved"></div>
+        <div class="qr"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 148 148" role="img" aria-label="QR code: open the AviusULD calendar" class="segno"><g transform="scale(4)"><path fill="#fff" d="M0 0h37v37h-37z"/><path class="qrline" stroke="#101820" d="M2 2.5h7m1 0h1m1 0h2m1 0h2m2 0h2m2 0h1m4 0h7m-33 1h1m5 0h1m1 0h4m1 0h2m1 0h1m1 0h2m1 0h2m3 0h1m5 0h1m-33 1h1m1 0h3m1 0h1m1 0h2m3 0h2m3 0h4m1 0h2m1 0h1m1 0h3m1 0h1m-33 1h1m1 0h3m1 0h1m3 0h3m1 0h3m1 0h1m1 0h2m4 0h1m1 0h3m1 0h1m-33 1h1m1 0h3m1 0h1m1 0h3m4 0h2m1 0h1m1 0h2m4 0h1m1 0h3m1 0h1m-33 1h1m5 0h1m2 0h1m2 0h1m1 0h3m3 0h1m2 0h2m1 0h1m5 0h1m-33 1h7m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h7m-24 1h1m1 0h1m1 0h4m1 0h1m3 0h1m-23 1h1m2 0h6m1 0h1m1 0h1m1 0h1m1 0h2m5 0h1m1 0h1m2 0h1m1 0h3m-32 1h1m1 0h1m1 0h1m2 0h1m2 0h3m1 0h1m1 0h3m2 0h2m4 0h3m-31 1h2m1 0h1m2 0h1m2 0h2m2 0h1m1 0h1m4 0h2m1 0h1m2 0h1m1 0h5m-32 1h1m1 0h2m2 0h1m1 0h3m1 0h1m1 0h2m1 0h1m1 0h1m2 0h1m3 0h1m2 0h1m-30 1h1m3 0h4m2 0h1m1 0h1m1 0h1m1 0h1m2 0h1m2 0h4m5 0h1m-33 1h3m1 0h2m1 0h6m1 0h1m3 0h1m1 0h4m1 0h1m1 0h1m-27 1h1m2 0h1m1 0h2m1 0h5m1 0h1m3 0h1m1 0h1m4 0h1m1 0h3m-31 1h1m1 0h2m6 0h1m3 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h2m1 0h4m1 0h1m-33 1h1m2 0h1m1 0h2m4 0h2m1 0h3m3 0h1m1 0h1m2 0h5m-30 1h1m1 0h1m1 0h1m2 0h2m3 0h1m2 0h1m1 0h6m3 0h1m1 0h1m1 0h3m-30 1h2m1 0h2m1 0h3m3 0h5m1 0h3m3 0h1m1 0h2m1 0h1m-32 1h3m3 0h1m1 0h2m3 0h1m4 0h2m1 0h1m1 0h2m2 0h3m-29 1h1m3 0h2m1 0h1m1 0h1m1 0h4m1 0h3m1 0h3m4 0h1m1 0h1m-32 1h1m1 0h1m2 0h1m1 0h3m2 0h2m5 0h1m2 0h2m1 0h1m1 0h3m-30 1h1m2 0h1m1 0h3m4 0h1m1 0h1m2 0h2m1 0h4m2 0h3m2 0h2m-33 1h1m2 0h2m3 0h2m2 0h1m2 0h1m1 0h1m4 0h4m1 0h1m2 0h1m-31 1h2m2 0h4m4 0h3m4 0h2m1 0h8m2 0h1m-25 1h2m3 0h1m1 0h3m3 0h1m2 0h1m3 0h1m1 0h2m-32 1h7m1 0h1m1 0h6m1 0h1m1 0h2m2 0h2m1 0h1m1 0h1m1 0h1m-31 1h1m5 0h1m1 0h2m7 0h4m1 0h3m3 0h5m-33 1h1m1 0h3m1 0h1m1 0h1m3 0h1m1 0h1m1 0h2m4 0h7m2 0h2m-33 1h1m1 0h3m1 0h1m1 0h1m1 0h2m4 0h8m1 0h1m1 0h1m3 0h2m-33 1h1m1 0h3m1 0h1m3 0h4m1 0h1m2 0h2m1 0h1m2 0h1m2 0h3m1 0h2m-33 1h1m5 0h1m2 0h2m1 0h1m5 0h3m1 0h1m2 0h4m1 0h3m-33 1h7m1 0h1m6 0h5m3 0h6"/></g></svg><span>Scan to view<br><b>สแกนเพื่อดูปฏิทิน</b></span></div>
       </div>
     </div>
   </section>
@@ -276,11 +284,10 @@ a.ol:focus-visible{outline:2px solid #0092BD;outline-offset:2px}
 
 <footer><div class="wrap">
   <div class="ft-text">
-  <div>The company reserves the right to make changes to the <span class="yEn">2027</span> traditional holiday information as deemed necessary and appropriate.</div>
-  <div class="thx">บริษัทฯ ขอสงวนสิทธิ์ในการเปลี่ยนแปลงข้อมูลวันหยุดตามประเพณี ประจำปี <span class="yBe">2570</span> ตามความจำเป็นและความเหมาะสม</div>
+  <div><span id="fApEn"></span>The company reserves the right to make changes to the <span class="yEn">2027</span> traditional holiday information as deemed necessary and appropriate.</div>
+  <div class="thx"><span id="fApTh"></span>บริษัทฯ ขอสงวนสิทธิ์ในการเปลี่ยนแปลงข้อมูลวันหยุดตามประเพณี ประจำปี <span class="yBe">2570</span> ตามความจำเป็นและความเหมาะสม</div>
   <div>AviusULD Ltd. · 999/146-153 Moo 15, Bangsaothong, Samutprakan 10570 · (+66) 2-330-3002</div>
 </div>
-  <div class="qr"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 148 148" role="img" aria-label="QR code: open the AviusULD calendar" class="segno"><g transform="scale(4)"><path fill="#fff" d="M0 0h37v37h-37z"/><path class="qrline" stroke="#101820" d="M2 2.5h7m1 0h1m1 0h2m1 0h2m2 0h2m2 0h1m4 0h7m-33 1h1m5 0h1m1 0h4m1 0h2m1 0h1m1 0h2m1 0h2m3 0h1m5 0h1m-33 1h1m1 0h3m1 0h1m1 0h2m3 0h2m3 0h4m1 0h2m1 0h1m1 0h3m1 0h1m-33 1h1m1 0h3m1 0h1m3 0h3m1 0h3m1 0h1m1 0h2m4 0h1m1 0h3m1 0h1m-33 1h1m1 0h3m1 0h1m1 0h3m4 0h2m1 0h1m1 0h2m4 0h1m1 0h3m1 0h1m-33 1h1m5 0h1m2 0h1m2 0h1m1 0h3m3 0h1m2 0h2m1 0h1m5 0h1m-33 1h7m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h7m-24 1h1m1 0h1m1 0h4m1 0h1m3 0h1m-23 1h1m2 0h6m1 0h1m1 0h1m1 0h1m1 0h2m5 0h1m1 0h1m2 0h1m1 0h3m-32 1h1m1 0h1m1 0h1m2 0h1m2 0h3m1 0h1m1 0h3m2 0h2m4 0h3m-31 1h2m1 0h1m2 0h1m2 0h2m2 0h1m1 0h1m4 0h2m1 0h1m2 0h1m1 0h5m-32 1h1m1 0h2m2 0h1m1 0h3m1 0h1m1 0h2m1 0h1m1 0h1m2 0h1m3 0h1m2 0h1m-30 1h1m3 0h4m2 0h1m1 0h1m1 0h1m1 0h1m2 0h1m2 0h4m5 0h1m-33 1h3m1 0h2m1 0h6m1 0h1m3 0h1m1 0h4m1 0h1m1 0h1m-27 1h1m2 0h1m1 0h2m1 0h5m1 0h1m3 0h1m1 0h1m4 0h1m1 0h3m-31 1h1m1 0h2m6 0h1m3 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h2m1 0h4m1 0h1m-33 1h1m2 0h1m1 0h2m4 0h2m1 0h3m3 0h1m1 0h1m2 0h5m-30 1h1m1 0h1m1 0h1m2 0h2m3 0h1m2 0h1m1 0h6m3 0h1m1 0h1m1 0h3m-30 1h2m1 0h2m1 0h3m3 0h5m1 0h3m3 0h1m1 0h2m1 0h1m-32 1h3m3 0h1m1 0h2m3 0h1m4 0h2m1 0h1m1 0h2m2 0h3m-29 1h1m3 0h2m1 0h1m1 0h1m1 0h4m1 0h3m1 0h3m4 0h1m1 0h1m-32 1h1m1 0h1m2 0h1m1 0h3m2 0h2m5 0h1m2 0h2m1 0h1m1 0h3m-30 1h1m2 0h1m1 0h3m4 0h1m1 0h1m2 0h2m1 0h4m2 0h3m2 0h2m-33 1h1m2 0h2m3 0h2m2 0h1m2 0h1m1 0h1m4 0h4m1 0h1m2 0h1m-31 1h2m2 0h4m4 0h3m4 0h2m1 0h8m2 0h1m-25 1h2m3 0h1m1 0h3m3 0h1m2 0h1m3 0h1m1 0h2m-32 1h7m1 0h1m1 0h6m1 0h1m1 0h2m2 0h2m1 0h1m1 0h1m1 0h1m-31 1h1m5 0h1m1 0h2m7 0h4m1 0h3m3 0h5m-33 1h1m1 0h3m1 0h1m1 0h1m3 0h1m1 0h1m1 0h2m4 0h7m2 0h2m-33 1h1m1 0h3m1 0h1m1 0h1m1 0h2m4 0h8m1 0h1m1 0h1m3 0h2m-33 1h1m1 0h3m1 0h1m3 0h4m1 0h1m2 0h2m1 0h1m2 0h1m2 0h3m1 0h2m-33 1h1m5 0h1m2 0h2m1 0h1m5 0h3m1 0h1m2 0h4m1 0h3m-33 1h7m1 0h1m6 0h5m3 0h6"/></g></svg><span>Scan to view<br><b>สแกนเพื่อดูปฏิทิน</b></span></div>
 </div></footer>
 
 <script>
@@ -412,7 +419,7 @@ function alignSign(){
   if(!sign||!lists||!row)return;
   sign.style.marginTop="40px";
   if(getComputedStyle(lists).gridTemplateColumns.trim().split(/\s+/).length<2)return;
-  const name=sign.querySelector(".sign-approved");
+  const name=sign.querySelector(".qr");
   const delta=row.getBoundingClientRect().top+8-(name||sign).getBoundingClientRect().top;
   sign.style.marginTop=Math.max(16,40+delta)+"px";
 }
@@ -433,7 +440,10 @@ function setYear(y){
   const blank=document.querySelector(".sign-date .blank"); if(blank&&!window.renderSign)blank.textContent=YEARS[y].signedDate||"";
   const stamp=document.getElementById("signStamp"); if(stamp){const v=YEARS[y].via;stamp.innerHTML=v?`✓ ${v[0]}<br><span style="font-weight:600">${v[1]}</span>`:""}
   const ap=document.getElementById("signApproved"), AP={2027:["23 November 2026","23 พฤศจิกายน 2569"],2026:["31 October 2025","31 ตุลาคม 2568"]}[y];
-  if(ap&&AP)ap.innerHTML=`This announcement has been approved by the company on ${AP[0]}.<span class="th">ประกาศนี้ได้รับการอนุมัติจากบริษัทแล้ว ณ วันที่ ${AP[1]}</span>`;
+  const fe=document.getElementById("fApEn"), ft=document.getElementById("fApTh");
+  if(fe&&AP)fe.textContent=`This announcement has been approved by the company on ${AP[0]}. `;
+  if(ft&&AP)ft.textContent=`ประกาศนี้ได้รับการอนุมัติจากบริษัทแล้ว ณ วันที่ ${AP[1]} `;
+  if(false&&ap&&AP)ap.innerHTML=`This announcement has been approved by the company on ${AP[0]}.<span class="th">ประกาศนี้ได้รับการอนุมัติจากบริษัทแล้ว ณ วันที่ ${AP[1]}</span>`;
   if(window.renderSign)window.renderSign();
   setTimeout(alignSign,0);
 }
