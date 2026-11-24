@@ -206,6 +206,8 @@ a.ol:focus-visible{outline:2px solid #0092BD;outline-offset:2px}
 /* date without underline when filled */
 .sign-date .blank:not(:empty){border-bottom:none!important;width:auto!important;vertical-align:baseline!important}
 .qr svg{width:104px;height:104px;display:block;border-radius:4px}
+/* approval block: date only (no signature, name or title) */
+.sign-line,.sign-name,.sign-title,.sign-stamp,.sign-btn,#ceoSig{display:none!important}
 </style>
 
 <header class="band">
@@ -405,7 +407,7 @@ function alignSign(){
   if(!sign||!lists||!row)return;
   sign.style.marginTop="40px";
   if(getComputedStyle(lists).gridTemplateColumns.trim().split(/\s+/).length<2)return;
-  const name=sign.querySelector(".sign-name");
+  const name=sign.querySelector(".sign-date");
   const delta=row.getBoundingClientRect().top+8-(name||sign).getBoundingClientRect().top;
   sign.style.marginTop=Math.max(16,40+delta)+"px";
 }
