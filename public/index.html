@@ -1,0 +1,521 @@
+<!doctype html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="robots" content="noindex,nofollow">
+<style>body{margin:0;font-size:14px}[hidden]{display:none!important}img{max-width:100%}</style>
+</head>
+<body>
+<title>2027 AviusULD Calendar</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@400;500;600;700&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap">
+<style>
+/* Layout: brand header band, summary strip, 12-month grid, then holiday + payday lists side by side */
+:root{
+  --bg:#FFFFFF; --panel:#ECECEC; --ink:#53565A; --ink-soft:#7A7D81; --line:#D9DADB;
+  --green:#00C19F; --green-ink:#007A64; --green-tint:#D6F5EF;
+  --blue:#0092BD; --blue-tint:#DCEFF6; --head-bg:#53565A; --head-fg:#FFFFFF;
+  --weekend:#97999B; --sub:#E03C31;
+  --sans:"IBM Plex Sans","IBM Plex Sans Thai",system-ui,sans-serif;
+  /* company legend colours (from the original Excel calendar) */
+  --c-we:#9CC2E5; --c-pay:#FFFF00; --c-hol:#FF0000; --c-dark:#1F2328; --c-comb:#00B0F0;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#16191D; --panel:#22262B; --ink:#E6E7E8; --ink-soft:#A6A8AB; --line:#33383E;
+  --green:#00C19F; --green-ink:#4FE0C4; --green-tint:#0E3A33; --blue:#3DB5D9; --blue-tint:#0D3141;
+  --head-bg:#101820; --head-fg:#FFFFFF; --weekend:#7B7E82; --sub:#FF7A70; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#16191D; --panel:#22262B; --ink:#E6E7E8; --ink-soft:#A6A8AB; --line:#33383E;
+  --green:#00C19F; --green-ink:#4FE0C4; --green-tint:#0E3A33; --blue:#3DB5D9; --blue-tint:#0D3141;
+  --head-bg:#101820; --head-fg:#FFFFFF; --weekend:#7B7E82; --sub:#FF7A70; color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--sans);font-size:15px;line-height:1.5}
+.wrap{max-width:1180px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+header.band{background:var(--head-bg);color:var(--head-fg)}
+header.band .wrap{padding-block:28px 24px;display:flex;flex-wrap:wrap;gap:16px 32px;align-items:flex-end;justify-content:space-between}
+.brand{font-weight:700;letter-spacing:.02em;font-size:13px;text-transform:uppercase;color:var(--green)}
+h1{margin:4px 0 2px;font-size:clamp(26px,4vw,38px);line-height:1.15;text-wrap:balance}
+.th{font-size:15px;opacity:.85}
+.stats{display:flex;gap:10px;flex-wrap:wrap}
+.stat{border:1px solid rgba(255,255,255,.25);border-radius:6px;padding:8px 14px;min-width:120px}
+.stat b{display:block;font-size:24px;font-variant-numeric:tabular-nums}
+.stat span{font-size:12px;opacity:.85}
+.next{background:var(--panel)}
+.next .wrap{padding-block:14px;display:flex;flex-wrap:wrap;gap:8px 28px;font-size:14px}
+.next strong{font-weight:600}
+.legend{display:flex;flex-wrap:wrap;gap:8px 20px;margin:22px 0 14px;font-size:13px;color:var(--ink-soft)}
+.legend span{display:inline-flex;align-items:center;gap:8px}
+.sw{width:18px;height:18px;border-radius:4px;display:inline-block}
+.sw.h{background:var(--c-hol)} .sw.p{background:var(--c-pay)}
+.sw.w{background:var(--c-we)}
+.months{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px}
+@media(max-width:1000px){.months{grid-template-columns:repeat(3,minmax(0,1fr))}}
+@media(max-width:740px){.months{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:480px){.months{grid-template-columns:1fr}}
+.month{border:1px solid var(--line);border-radius:8px;padding:12px 12px 10px;background:var(--bg)}
+.month h3{margin:0 0 8px;font-size:19px;font-weight:700;letter-spacing:.01em;display:flex;justify-content:space-between;align-items:baseline;gap:8px}
+.month h3 small{font-weight:400;color:var(--ink-soft);font-size:12.5px}
+td .mo{font-size:16px;font-weight:700}
+.grid{display:grid;grid-template-columns:auto repeat(7,1fr);gap:2px;text-align:center;font-variant-numeric:tabular-nums}
+.dow{font-size:11px;color:var(--ink-soft);font-weight:600;padding-bottom:2px}
+.wk{font-size:10.5px;color:var(--ink-soft);padding:6px 6px 0 0;text-align:left;border-right:1px solid var(--line);white-space:nowrap}
+.d{font-size:13px;padding:5px 0;border-radius:5px;cursor:default;position:relative}
+.d.we{background:var(--c-we);color:var(--c-dark)}
+.d.hol{background:var(--c-hol);color:#fff;font-weight:700}
+.d.pay{background:var(--c-pay);color:var(--c-dark);font-weight:700}
+.d.today{text-decoration:underline;text-underline-offset:3px}
+.d[title]{cursor:help}
+.lists{display:grid;grid-template-columns:minmax(0,3fr) minmax(0,2fr);gap:24px;margin:36px 0 20px;align-items:start}
+@media(max-width:860px){.lists{grid-template-columns:1fr}}
+h2{font-size:19px;margin:0 0 4px}
+.sub{color:var(--ink-soft);font-size:13px;margin:0 0 12px}
+.tbl{overflow-x:auto;border:1px solid var(--line);border-radius:8px}
+table{border-collapse:collapse;width:100%;font-size:14px}
+th{background:var(--green);color:#fff;text-align:left;font-weight:600;padding:9px 12px;white-space:nowrap}
+td{padding:9px 12px;border-top:1px solid var(--line);vertical-align:top}
+tbody tr:nth-child(even) td{background:var(--panel)}
+td.n{font-variant-numeric:tabular-nums;color:var(--ink-soft);width:1%}
+td .en{display:block;color:var(--ink-soft);font-size:12.5px}
+.tag{display:inline-block;font-size:11px;font-weight:600;color:var(--sub);border:1px solid currentColor;border-radius:4px;padding:0 5px;margin-left:6px;vertical-align:1px}
+.past td{opacity:.5}
+footer{border-top:1px solid var(--line);margin-top:28px}
+footer .wrap{padding-block:18px 28px;font-size:12.5px;color:var(--ink-soft);display:grid;gap:4px}
+.sw.c{background:var(--c-comb)} .sw.cf{background:repeating-linear-gradient(135deg,var(--c-comb) 0 4px,#fff 4px 7px);outline:1px solid var(--c-comb);outline-offset:-1px}
+.d.comb{background:var(--c-comb);color:#fff;font-weight:700}
+.d.cf{background:repeating-linear-gradient(135deg,var(--c-comb) 0 4px,#fff 4px 7px);color:var(--c-dark);font-weight:700;box-shadow:inset 0 0 0 1.5px var(--c-comb)}
+.tabs{display:flex;gap:4px;flex-wrap:wrap;margin-top:22px;border-bottom:2px solid var(--line)}
+.tab{font:inherit;font-size:14px;font-weight:600;color:var(--ink-soft);background:var(--panel);border:1px solid var(--line);border-bottom:none;border-radius:6px 6px 0 0;padding:8px 16px;cursor:pointer;margin-bottom:-2px}
+.tab[aria-selected="true"]{background:var(--bg);color:var(--ink);border-color:var(--line);border-bottom:2px solid var(--bg);box-shadow:inset 0 3px 0 var(--green)}
+.tab:focus-visible{outline:2px solid var(--blue);outline-offset:2px}
+.optnote{margin:12px 0 0;font-size:13.5px;color:var(--ink)}
+.optnote .en{display:block;color:var(--ink-soft);font-size:12.5px}
+.tag.cf{color:var(--blue)}
+.sign{margin-top:40px;display:grid;justify-items:center;gap:2px;text-align:center;font-weight:700;color:var(--ink)}
+.sign-line{width:min(260px,100%);height:56px;border-bottom:1.5px solid var(--ink);margin-bottom:6px}
+.sign-title,.sign-date{font-size:14px}
+.sign-date .blank{display:inline-block;width:130px;border-bottom:1px solid var(--ink);vertical-align:-3px}
+.draft{display:inline-block;font-size:.42em;font-weight:700;letter-spacing:.12em;vertical-align:middle;border:2px solid var(--c-pay);color:var(--c-pay);border-radius:4px;padding:2px 8px;margin-left:8px}
+header.band{background:var(--bg);color:var(--ink);border-bottom:3px solid var(--green)}
+header.band .wrap.hdr{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:12px 20px;padding-block:18px}
+.hdr .logo{height:52px;width:auto;justify-self:start}
+.hdr .ttl{text-align:center}
+.hdr .th{opacity:1;color:var(--ink-soft)}
+.draft{border-color:#C9A800 !important;color:#8A7400 !important}
+@media(max-width:640px){header.band .wrap.hdr{grid-template-columns:1fr}.hdr .logo{justify-self:center;height:44px}.hdr>span{display:none}}
+
+/* larger Thai text for Thai-speaking staff */
+.hdr .th{font-size:clamp(21px,3.2vw,30px);font-weight:600;line-height:1.3;margin-top:2px}
+.month h3 small{font-size:16px}
+.dow{font-size:13px}
+td .en{font-size:15.5px}
+.sub{font-size:15px}
+.legend{font-size:14.5px}
+.thx{font-size:15px}
+@media print{.ypick,.dl{display:none!important}
+  *{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  .month,.sign,tr,.lists>div{break-inside:avoid}
+}
+/* AviusULD dark gray header band */
+header.band{background:#53565A;color:#FFFFFF}
+header.band h1{color:#FFFFFF}
+.hdr .th{color:#E6E7E8}
+.hdr .logo{height:72px;background:none;padding:0}
+@media(max-width:640px){.hdr .logo{height:56px}}
+.draft{border-color:#FFFF00 !important;color:#FFFF00 !important}
+.month h3 small{font-weight:700;color:var(--ink)}
+/* tidy legend: equal columns, swatch + English over Thai */
+.legend{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px 20px;margin:24px 0 18px;color:var(--ink)}
+.legend>span{display:flex;align-items:center;gap:12px;min-width:0}
+.legend .sw{flex:0 0 28px;width:28px;height:28px;border-radius:5px}
+.legend .lt{display:flex;flex-direction:column;align-items:flex-start;text-align:left;gap:1px;line-height:1.25}
+.legend .lt b{font-size:15px;font-weight:700}
+.legend .lt em{font-style:normal;font-size:17px;font-weight:600;color:var(--ink-soft)}
+@media(max-width:900px){.legend{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:480px){.legend{grid-template-columns:1fr}}
+footer .wrap{font-size:15px;gap:6px;color:var(--ink)}
+footer .thx{font-size:16px;font-weight:400}
+/* year picker */
+.ypick{justify-self:end;display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+.ypl{font-size:13px;color:#E6E7E8;margin-right:2px}
+.ypick button{font:inherit;font-size:15px;font-weight:700;padding:6px 14px;border-radius:6px;border:1.5px solid #ECECEC;background:transparent;color:#FFFFFF;cursor:pointer}
+.ypick button[aria-pressed="true"]{background:#00C19F;border-color:#00C19F;color:#FFFFFF}
+.ypick button:focus-visible{outline:2px solid #FFFF00;outline-offset:2px}
+@media(max-width:640px){.ypick{justify-self:center}}
+.hdr>span[aria-hidden]{display:none}
+/* footer with QR code on the right */
+footer .wrap{grid-template-columns:minmax(0,1fr) auto;align-items:center;column-gap:24px}
+.ft-text{display:grid;gap:6px;min-width:0}
+.qr{display:flex;align-items:center;gap:10px}
+.qr svg{width:104px;height:104px;display:block;border-radius:4px}
+.qr span{font-size:13px;line-height:1.35;color:var(--ink-soft)}
+.qr span b{font-size:15px;color:var(--ink)}
+@media(max-width:600px){footer .wrap{grid-template-columns:1fr}.qr{justify-self:start}}
+/* one-page PDF download */
+.dl{display:flex;align-items:center;justify-content:flex-end;flex-wrap:wrap;gap:8px;margin-top:16px;font-size:14px;font-weight:600}
+.dl button{font:inherit;font-size:14px;font-weight:700;padding:6px 14px;border-radius:6px;border:1.5px solid #53565A;background:var(--bg);color:var(--ink);cursor:pointer}
+.dl button:hover{background:#53565A;color:#fff}
+.dl button:focus-visible{outline:2px solid #0092BD;outline-offset:2px}
+.dl-msg{font-weight:400;color:var(--ink-soft);font-size:13px}
+.d.hol.paysplit{background:linear-gradient(135deg,var(--c-pay) 0 50%,var(--c-hol) 50% 100%);color:var(--c-dark)}
+.pad-wrap[hidden],.dl[hidden],[hidden]{display:none!important}
+/* Outlook links */
+td.olc,th.olc{width:1%;white-space:nowrap;text-align:right}
+a.ol{display:inline-block;font-size:12.5px;font-weight:700;color:#0078D4;border:1.5px solid #0078D4;border-radius:5px;padding:2px 8px;text-decoration:none}
+a.ol:hover{background:#0078D4;color:#fff}
+a.ol:focus-visible{outline:2px solid #0092BD;outline-offset:2px}
+.dl-sep{width:1px;height:22px;background:var(--line);margin:0 4px}
+@media print{.olc{display:none!important}}
+.d.comb.paysplit{background:linear-gradient(135deg,var(--c-pay) 0 50%,var(--c-comb) 50% 100%);color:var(--c-dark)}
+/* keep each date (and its year) on one line */
+#hol td:nth-child(2),#comb td:nth-child(2),#hol td:nth-child(2) .en,#comb td:nth-child(2) .en{white-space:nowrap}
+.lists{grid-template-columns:minmax(0,1.25fr) minmax(0,1fr)}
+@media(max-width:1100px){.lists{grid-template-columns:1fr}}
+#comb td:nth-child(3),#comb td:nth-child(3) .en{white-space:nowrap}
+/* split payday cells: vector clip-path instead of a gradient, so the diagonal prints as a clean straight line */
+.d.paysplit{isolation:isolate;overflow:hidden}
+.d.hol.paysplit{background:var(--c-hol)!important}
+.d.comb.paysplit{background:var(--c-comb)!important}
+.d.paysplit::before{content:"";position:absolute;inset:0;background:var(--c-pay);clip-path:polygon(0 0,100% 0,0 100%);z-index:-1;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+/* split cell v2: no cell background; yellow and red/blue are two separate shapes, so no colour fringes at the edges */
+.d.hol.paysplit,.d.comb.paysplit{background:transparent!important}
+.d.paysplit::before{border-radius:inherit;clip-path:polygon(0 0,100% 0,100% 6%,6% 100%,0 100%)!important}
+.d.paysplit::after{content:"";position:absolute;inset:0;border-radius:inherit;clip-path:polygon(100% 0,100% 100%,0 100%);z-index:-1;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+.d.hol.paysplit::after{background:var(--c-hol)}
+.d.comb.paysplit::after{background:var(--c-comb)}
+/* empty space reserved for a QR code, added later */
+.qr-slot{width:104px;height:104px;border:1.5px dashed #97999B;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;letter-spacing:.08em;color:#BBBCBC;background:var(--bg)}
+.ol-mail{display:inline-block;font-size:14px;font-weight:700;padding:6px 14px;border-radius:6px;border:1.5px solid #0078D4;color:#0078D4;text-decoration:none;background:var(--bg)}
+.ol-mail:hover{background:#0078D4;color:#fff}
+.ol-mail:focus-visible{outline:2px solid #0092BD;outline-offset:2px}
+@media print{.ol-mail{display:none!important}}
+.dl .eml-btn{background:#00C19F;border-color:#00C19F;color:#fff}
+.dl .eml-btn:hover{background:#00A386;border-color:#00A386;color:#fff}
+.sign-line{position:relative}
+.sign-stamp{position:absolute;left:0;right:0;bottom:8px;text-align:center;font-size:14px;font-weight:700;color:#007A64;letter-spacing:.02em}
+.sign-stamp:empty{display:none}
+.sign-stamp{position:static!important;margin-top:6px;font-size:13px!important}
+.sign-line{height:76px!important}
+#ceoSig{position:absolute;left:50%;bottom:2px;transform:translateX(-50%);width:260px;height:70px;pointer-events:none}
+.sign,.sign *{user-select:none;-webkit-user-select:none;-webkit-touch-callout:none}
+/* date without underline when filled */
+.sign-date .blank:not(:empty){border-bottom:none!important;width:auto!important;vertical-align:baseline!important}
+.qr svg{width:104px;height:104px;display:block;border-radius:4px}
+</style>
+
+<header class="band">
+  <div class="wrap hdr">
+    <img class="logo" src="data:image/png;base64,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" alt="AviusULD">
+    <div class="ttl">
+      <h1><span id="yTitle">2027 AviusULD Calendar</span></h1>
+      <div class="th" id="yTh">ปฏิทินบริษัท อาวียุส ยูแอลดี จำกัด ประจำปี 2570</div>
+    </div>
+    <div class="ypick" role="group" aria-label="Year · ปี">
+      <span class="ypl">Year · ปี</span>
+      <button type="button" data-y="2027">2027</button>
+      <button type="button" data-y="2026">2026</button>
+    </div>
+  </div>
+</header>
+
+<main class="wrap">
+
+  <div class="dl" id="dl" hidden>
+    <span>Print on one page · พิมพ์หนึ่งหน้า</span>
+    <button type="button" data-size="A4">A4</button>
+    <button type="button" data-size="A3">A3</button>
+    <span class="dl-sep" aria-hidden="true"></span>
+    <span>Add all to Outlook · เพิ่มทั้งหมดใน Outlook</span>
+    <button type="button" data-ics="1">Outlook (.ics)</button>
+    <span class="dl-sep" aria-hidden="true"></span>
+    
+
+    <span class="dl-msg" id="dlMsg" role="status"></span>
+  </div>
+  <div class="legend" id="legend"></div>
+  <section class="months" id="months" aria-label="12-month calendar"></section>
+
+  <section class="lists">
+    <div>
+      <h2>Traditional Holidays (13 days)</h2>
+      <p class="sub">วันหยุดตามประเพณี 13 วัน · <span class="tag" style="margin:0">Substitute</span> = the actual holiday falls on a weekend · วันหยุดชดเชย</p>
+      <div class="tbl"><table>
+        <thead><tr><th>#</th><th>Date / วันที่</th><th>Holiday / วันหยุด</th><th class="olc">Outlook</th></tr></thead>
+        <tbody id="hol"></tbody>
+      </table></div>
+    </div>
+    <div>
+      <h2 id="combTitle"></h2>
+      <p class="sub" id="combSub"></p>
+      <div class="tbl"><table>
+        <thead><tr><th>#</th><th>Date / วันที่</th><th>Holiday / วันหยุด</th><th class="olc">Outlook</th></tr></thead>
+        <tbody id="comb"></tbody>
+      </table></div>
+      <div class="sign">
+        <div class="sign-line" aria-label="Signature"><canvas id="ceoSig" width="260" height="70" aria-label="Signature of Charles Drummond, Chief Executive Officer"></canvas></div>
+        <div class="sign-name">( Charles Drummond )</div>
+        <div class="sign-title">Chief Executive Officer</div>
+        <div class="sign-date">Date: <span class="blank"></span></div>
+        <div class="sign-stamp" id="signStamp"></div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer><div class="wrap">
+  <div class="ft-text">
+  <div>The company reserves the right to make changes to the <span class="yEn">2027</span> traditional holiday information as deemed necessary and appropriate.</div>
+  <div class="thx">บริษัทฯ ขอสงวนสิทธิ์ในการเปลี่ยนแปลงข้อมูลวันหยุดตามประเพณี ประจำปี <span class="yBe">2570</span> ตามความจำเป็นและความเหมาะสม</div>
+  <div>AviusULD Ltd. · 999/146-153 Moo 15, Bangsaothong, Samutprakan 10570 · (+66) 2-330-3002</div>
+</div>
+  <div class="qr"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 148 148" role="img" aria-label="QR code: open the AviusULD calendar" class="segno"><g transform="scale(4)"><path fill="#fff" d="M0 0h37v37h-37z"/><path class="qrline" stroke="#101820" d="M2 2.5h7m1 0h1m1 0h2m1 0h2m2 0h2m2 0h1m4 0h7m-33 1h1m5 0h1m1 0h4m1 0h2m1 0h1m1 0h2m1 0h2m3 0h1m5 0h1m-33 1h1m1 0h3m1 0h1m1 0h2m3 0h2m3 0h4m1 0h2m1 0h1m1 0h3m1 0h1m-33 1h1m1 0h3m1 0h1m3 0h3m1 0h3m1 0h1m1 0h2m4 0h1m1 0h3m1 0h1m-33 1h1m1 0h3m1 0h1m1 0h3m4 0h2m1 0h1m1 0h2m4 0h1m1 0h3m1 0h1m-33 1h1m5 0h1m2 0h1m2 0h1m1 0h3m3 0h1m2 0h2m1 0h1m5 0h1m-33 1h7m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h7m-24 1h1m1 0h1m1 0h4m1 0h1m3 0h1m-23 1h1m2 0h6m1 0h1m1 0h1m1 0h1m1 0h2m5 0h1m1 0h1m2 0h1m1 0h3m-32 1h1m1 0h1m1 0h1m2 0h1m2 0h3m1 0h1m1 0h3m2 0h2m4 0h3m-31 1h2m1 0h1m2 0h1m2 0h2m2 0h1m1 0h1m4 0h2m1 0h1m2 0h1m1 0h5m-32 1h1m1 0h2m2 0h1m1 0h3m1 0h1m1 0h2m1 0h1m1 0h1m2 0h1m3 0h1m2 0h1m-30 1h1m3 0h4m2 0h1m1 0h1m1 0h1m1 0h1m2 0h1m2 0h4m5 0h1m-33 1h3m1 0h2m1 0h6m1 0h1m3 0h1m1 0h4m1 0h1m1 0h1m-27 1h1m2 0h1m1 0h2m1 0h5m1 0h1m3 0h1m1 0h1m4 0h1m1 0h3m-31 1h1m1 0h2m6 0h1m3 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h2m1 0h4m1 0h1m-33 1h1m2 0h1m1 0h2m4 0h2m1 0h3m3 0h1m1 0h1m2 0h5m-30 1h1m1 0h1m1 0h1m2 0h2m3 0h1m2 0h1m1 0h6m3 0h1m1 0h1m1 0h3m-30 1h2m1 0h2m1 0h3m3 0h5m1 0h3m3 0h1m1 0h2m1 0h1m-32 1h3m3 0h1m1 0h2m3 0h1m4 0h2m1 0h1m1 0h2m2 0h3m-29 1h1m3 0h2m1 0h1m1 0h1m1 0h4m1 0h3m1 0h3m4 0h1m1 0h1m-32 1h1m1 0h1m2 0h1m1 0h3m2 0h2m5 0h1m2 0h2m1 0h1m1 0h3m-30 1h1m2 0h1m1 0h3m4 0h1m1 0h1m2 0h2m1 0h4m2 0h3m2 0h2m-33 1h1m2 0h2m3 0h2m2 0h1m2 0h1m1 0h1m4 0h4m1 0h1m2 0h1m-31 1h2m2 0h4m4 0h3m4 0h2m1 0h8m2 0h1m-25 1h2m3 0h1m1 0h3m3 0h1m2 0h1m3 0h1m1 0h2m-32 1h7m1 0h1m1 0h6m1 0h1m1 0h2m2 0h2m1 0h1m1 0h1m1 0h1m-31 1h1m5 0h1m1 0h2m7 0h4m1 0h3m3 0h5m-33 1h1m1 0h3m1 0h1m1 0h1m3 0h1m1 0h1m1 0h2m4 0h7m2 0h2m-33 1h1m1 0h3m1 0h1m1 0h1m1 0h2m4 0h8m1 0h1m1 0h1m3 0h2m-33 1h1m1 0h3m1 0h1m3 0h4m1 0h1m2 0h2m1 0h1m2 0h1m2 0h3m1 0h2m-33 1h1m5 0h1m2 0h2m1 0h1m5 0h3m1 0h1m2 0h4m1 0h3m-33 1h7m1 0h1m6 0h5m3 0h6"/></g></svg><span>Scan to view<br><b>สแกนเพื่อดูปฏิทิน</b></span></div>
+</div></footer>
+
+<script>
+let Y=2027;
+const MTH=["มกราคม","กุมภาพันธ์","มีนาคม","เมษายน","พฤษภาคม","มิถุนายน","กรกฎาคม","สิงหาคม","กันยายน","ตุลาคม","พฤศจิกายน","ธันวาคม"];
+const MEN=["January","February","March","April","May","June","July","August","September","October","November","December"];
+const DTH=["อาทิตย์","จันทร์","อังคาร","พุธ","พฤหัสบดี","ศุกร์","เสาร์"];
+const DEN=["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"];
+const DOW=["อา","จ","อ","พ","พฤ","ศ","ส"];
+// [month(1-12), day, Thai name, English name, substitute?]
+const YEARS={
+ 2027:{be:2570,hol:[
+ [1,1,"วันขึ้นปีใหม่","New Year's Day"],
+ [2,22,"ชดเชยวันมาฆบูชา (อา. 21 ก.พ.)","Substitute for Makha Bucha Day (Sun 21 Feb)",1],
+ [4,13,"วันสงกรานต์","Songkran Festival"],
+ [4,14,"วันสงกรานต์","Songkran Festival"],
+ [4,15,"วันสงกรานต์","Songkran Festival"],
+ [5,3,"ชดเชยวันแรงงานแห่งชาติ (ส. 1 พ.ค.)","Substitute for National Labour Day (Sat 1 May)",1],
+ [6,3,"วันเฉลิมพระชนมพรรษาสมเด็จพระนางเจ้าฯ พระบรมราชินี","H.M. Queen Suthida's Birthday"],
+ [7,19,"ชดเชยวันอาสาฬหบูชา (อา. 18 ก.ค.)","Substitute for Asarnha Bucha Day (Sun 18 Jul)",1],
+ [7,28,"วันเฉลิมพระชนมพรรษา รัชกาลที่ 10","H.M. King Rama X's Birthday"],
+ [8,12,"วันแม่แห่งชาติ","National Mother's Day"],
+ [10,13,"วันนวมินทรมหาราช","King Rama IX Memorial Day"],
+ [12,6,"ชดเชยวันพ่อแห่งชาติ (อา. 5 ธ.ค.)","Substitute for National Father's Day (Sun 5 Dec)",1],
+ [12,31,"วันสิ้นปี","New Year's Eve"]],
+ comb:[[4,12,"c"],[4,16,"c"],[12,28,"c"],[12,29,"c"],[12,30,"c"]], pay:[[1,28],[2,28],[3,28],[4,28],[5,28],[6,28],[7,28],[8,28],[9,28],[10,28],[11,28],[12,27]], signedDate:"23 November 2026", via:null},
+ // 2026: from the signed AviusULD Calendar 2026 (CEO, 31 October 2025)
+ 2026:{be:2569,hol:[
+ [1,1,"วันขึ้นปีใหม่","New Year's Day"],
+ [3,3,"วันมาฆบูชา","Makha Bucha Day"],
+ [4,13,"วันสงกรานต์","Songkran Festival"],
+ [4,14,"วันสงกรานต์","Songkran Festival"],
+ [4,15,"วันสงกรานต์","Songkran Festival"],
+ [5,1,"วันแรงงานแห่งชาติ","National Labour Day"],
+ [6,3,"วันเฉลิมพระชนมพรรษาสมเด็จพระนางเจ้าฯ พระบรมราชินี","H.M. Queen Suthida's Birthday"],
+ [7,28,"วันเฉลิมพระชนมพรรษา รัชกาลที่ 10","H.M. King Rama X's Birthday"],
+ [7,29,"วันอาสาฬหบูชา","Asarnha Bucha Day"],
+ [8,12,"วันแม่แห่งชาติ","National Mother's Day"],
+ [10,13,"วันนวมินทรมหาราช","King Rama IX Memorial Day"],
+ [12,7,"ชดเชยวันพ่อแห่งชาติ (อา. 5 ธ.ค.)","Substitute for National Father's Day (Sun 5 Dec)",1],
+ [12,31,"วันสิ้นปี","New Year's Eve"]],
+ comb:[[1,2,"s"],[4,16,"c"],[4,17,"c"],[12,28,"c"],[12,29,"c"],[12,30,"c"]],
+ pay:[[1,28],[2,28],[3,28],[4,28],[5,28],[6,28],[7,28],[8,28],[9,28],[10,28],[11,28],[12,25]], signedDate:"31 October 2025", via:["Approved via DocuSign","อนุมัติผ่าน DocuSign"]}
+};
+let HOL=YEARS[2027].hol;
+const key=(m,d)=>m*100+d;
+let holMap=new Map(HOL.map(h=>[key(h[0],h[1]),h]));
+// Combined holidays per option: [month, day, type]  type "c" = combined holiday, "cf" = annual leave carried forward from 2026
+const OPTS={
+  "option-1":{
+    note:["Combined holidays follow the same pattern as last year.","วันหยุดพักร้อนร่วมใช้รูปแบบเดียวกับปีที่ผ่านมา"],
+    comb:[[4,12,"c"],[4,16,"c"],[12,28,"c"],[12,29,"c"],[12,30,"c"]]
+  }
+};
+const isWeekend=d=>d.getDay()===0||d.getDay()===6;
+const today=new Date();today.setHours(0,0,0,0);
+const fmtTH=d=>`${DTH[d.getDay()]}ที่ ${d.getDate()} ${MTH[d.getMonth()]} ${d.getFullYear()+543}`;
+const fmtEN=d=>`${DEN[d.getDay()]}, ${d.getDate()} ${MEN[d.getMonth()]} ${d.getFullYear()}`;
+// week number: weeks run Sunday–Saturday, wk1 = week containing 1 January (same as the Excel calendar)
+let JAN1=new Date(Y,0,1).getDay();
+const wkNo=d=>Math.floor((Math.round((d-new Date(Y,0,1))/864e5)+JAN1)/7)+1;
+
+// Outlook on the web: opens a new all-day event, prefilled
+const ymd=d=>`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`;
+function olLink(d,en,th){
+  const e=new Date(d);e.setDate(e.getDate()+1);
+  const q=new URLSearchParams({path:"/calendar/action/compose",rru:"addevent",subject:`${en} · ${th} (AviusULD)`,startdt:ymd(d),enddt:ymd(e),allday:"true",body:"AviusULD Company Calendar · ปฏิทินบริษัท อาวียุส ยูแอลดี"});
+  return `<a class="ol" href="https://outlook.office.com/calendar/0/deeplink/compose?${q}" target="_blank" rel="noopener" title="Add to Outlook calendar · เพิ่มในปฏิทิน Outlook">+ Outlook</a>`;
+}
+function renderHol(){document.getElementById("hol").innerHTML=HOL.map((h,i)=>{
+  const d=new Date(Y,h[0]-1,h[1]);
+  return `<tr><td class="n">${i+1}</td><td>${fmtEN(d)}<span class="en">${fmtTH(d)}</span></td><td>${h[3]}${h[4]?'<span class="tag">Substitute</span>':""}<span class="en">${h[2]}</span></td><td class="olc">${olLink(d,h[3],h[2])}</td></tr>`;
+}).join("");}
+renderHol();
+
+function render(id){
+  const o=Y===2027?OPTS[id]:{comb:YEARS[Y].comb};
+  const combMap=new Map(o.comb.map(c=>[key(c[0],c[1]),c[2]]));
+  const nComb=o.comb.filter(c=>c[2]==="c").length, nSp=o.comb.filter(c=>c[2]==="s").length, hasCF=o.comb.some(c=>c[2]==="cf");
+  // payday: the 28th, or the previous working day if the 28th is a weekend or any company holiday
+  const isOff=d=>{const k=key(d.getMonth()+1,d.getDate());return isWeekend(d)||holMap.has(k)||combMap.get(k)==="c"||combMap.get(k)==="s"};
+  const payMap=new Set();
+  if(YEARS[Y].pay)YEARS[Y].pay.forEach(x=>payMap.add(key(x[0],x[1])));
+  else for(let m=0;m<12;m++){let d=new Date(Y,m,28);while(isOff(d))d.setDate(d.getDate()-1);payMap.add(key(m+1,d.getDate()))}
+
+  document.getElementById("legend").innerHTML=
+    '<span><i class="sw w"></i><span class="lt"><b>Weekend</b><em>วันหยุดประจำสัปดาห์</em></span></span>'+
+    '<span><i class="sw p"></i><span class="lt"><b>The salary will be paid as mention dated.</b><em>วันจ่ายเงินเดือน</em></span></span>'+
+    '<span><i class="sw h"></i><span class="lt"><b>Traditional Holidays (13 days)</b><em>วันหยุดตามประเพณี (13 วัน)</em></span></span>'+
+    `<span><i class="sw c"></i><span class="lt"><b>Combined Holidays (${nComb} days)${nSp?` and Special Holiday (${nSp} day)`:""}</b><em>วันหยุดพักร้อนร่วม (${nComb} วัน)${nSp?` และวันหยุดพิเศษ (${nSp} วัน)`:""}</em></span></span>`+
+    (hasCF?'<span><i class="sw cf"></i><span class="lt"><b>Annual leave carried forward from 2026</b><em>ใช้วันลาพักร้อนสะสมปี 2569</em></span></span>':"");
+
+  let html="";
+  for(let m=0;m<12;m++){
+    const first=new Date(Y,m,1).getDay(), n=new Date(Y,m+1,0).getDate();
+    let cells='<div class="dow"></div>'+DOW.map(x=>`<div class="dow">${x}</div>`).join("")+`<div class="wk">wk${wkNo(new Date(Y,m,1))}</div>`+"<div></div>".repeat(first);
+    for(let d=1;d<=n;d++){
+      const dt=new Date(Y,m,d),k=key(m+1,d),h=holMap.get(k),c=combMap.get(k);
+      if(d>1&&dt.getDay()===0)cells+=`<div class="wk">wk${wkNo(dt)}</div>`;
+      let cls="d",tip="";
+      if(h){cls+=" hol";tip=h[3]+" · "+h[2];if(payMap.has(k)){cls+=" paysplit";tip+=" + Payday · วันจ่ายเงินเดือน"}}
+      else if(c==="c"){cls+=" comb";tip="Combined Holiday · วันหยุดพักร้อนร่วม";if(payMap.has(k)){cls+=" paysplit";tip+=" + Payday · วันจ่ายเงินเดือน"}}
+      else if(c==="s"){cls+=" comb";tip="Special Holiday · วันหยุดพิเศษ"}
+      else if(c==="cf"){cls+=" cf";tip="Annual leave carried forward from 2026 · ใช้วันลาพักร้อนสะสมปี 2569"}
+      else if(payMap.has(k)){cls+=" pay";tip="Payday · วันจ่ายเงินเดือน"}
+      else if(isWeekend(dt))cls+=" we";
+      cells+=`<div class="${cls}"${tip?` title="${tip}"`:""}>${d}</div>`;
+    }
+    html+=`<article class="month"><h3>${MEN[m].toUpperCase()} <small>${MTH[m]}</small></h3><div class="grid">${cells}</div></article>`;
+  }
+  document.getElementById("months").innerHTML=html;
+
+  document.getElementById("combTitle").textContent=`Combined Holidays (${nComb} days)`+(nSp?` and Special Holiday (${nSp} day)`:"");
+  document.getElementById("combSub").textContent=`วันหยุดพักร้อนร่วม ${nComb} วัน`+(nSp?` และวันหยุดพิเศษ ${nSp} วัน`:"")+(hasCF?" และวันที่ใช้วันลาพักร้อนสะสมปี 2569":"");
+  let i=0;
+  document.getElementById("comb").innerHTML=o.comb.map(c=>{
+    const d=new Date(Y,c[0]-1,c[1]);
+    const name=c[2]==="c"?'Combined Holiday<span class="en">วันหยุดพักร้อนร่วม</span>':c[2]==="s"?'Special Holiday<span class="en">วันหยุดพิเศษ</span>'
+      :'Annual leave carried forward from 2026<span class="tag cf">Not combined</span><span class="en">ใช้วันลาพักร้อนสะสม (carry forward) ปี 2569 · ไม่ใช่วันหยุดพักร้อนร่วม</span>';
+    const nm=c[2]==="c"?["Combined Holiday","วันหยุดพักร้อนร่วม"]:c[2]==="s"?["Special Holiday","วันหยุดพิเศษ"]:["Carried-forward annual leave","ใช้วันลาพักร้อนสะสม"];
+    return `<tr><td class="n">${c[2]!=="cf"?++i:"–"}</td><td>${fmtEN(d)}<span class="en">${fmtTH(d)}</span></td><td>${name}</td><td class="olc">${olLink(d,nm[0],nm[1])}</td></tr>`;
+  }).join("");
+}
+render("option-1");
+
+// line the CEO name/title up with row 8 of the Traditional Holidays table (two-column layout only)
+function alignSign(){
+  const sign=document.querySelector(".sign"),lists=document.querySelector(".lists"),row=document.querySelectorAll("#hol tr")[7];
+  if(!sign||!lists||!row)return;
+  sign.style.marginTop="40px";
+  if(getComputedStyle(lists).gridTemplateColumns.trim().split(/\s+/).length<2)return;
+  const name=sign.querySelector(".sign-name");
+  const delta=row.getBoundingClientRect().top+8-(name||sign).getBoundingClientRect().top;
+  sign.style.marginTop=Math.max(16,40+delta)+"px";
+}
+alignSign();
+if(document.fonts&&document.fonts.ready)document.fonts.ready.then(alignSign);
+addEventListener("resize",alignSign);
+addEventListener("hashchange",()=>setTimeout(alignSign,0));
+
+// ---- year picker: 2027 (current) and 2026 (signed archive) ----
+function setYear(y){
+  if(!YEARS[y])y=2027; Y=y; HOL=YEARS[y].hol; holMap=new Map(HOL.map(h=>[key(h[0],h[1]),h])); JAN1=new Date(Y,0,1).getDay();
+  document.getElementById("yTitle").textContent=y+" AviusULD Calendar";
+  document.getElementById("yTh").textContent="ปฏิทินบริษัท อาวียุส ยูแอลดี จำกัด ประจำปี "+YEARS[y].be;
+  document.querySelectorAll(".yEn").forEach(e=>e.textContent=y);
+  document.querySelectorAll(".yBe").forEach(e=>e.textContent=YEARS[y].be);
+  document.querySelectorAll(".ypick button").forEach(b=>b.setAttribute("aria-pressed",String(+b.dataset.y===y)));
+  renderHol(); render("option-1");
+  const blank=document.querySelector(".sign-date .blank"); if(blank&&!window.renderSign)blank.textContent=YEARS[y].signedDate||"";
+  const stamp=document.getElementById("signStamp"); if(stamp){const v=YEARS[y].via;stamp.innerHTML=v?`✓ ${v[0]}<br><span style="font-weight:600">${v[1]}</span>`:""}
+  if(window.renderSign)window.renderSign();
+  setTimeout(alignSign,0);
+}
+document.querySelectorAll(".ypick button").forEach(b=>b.addEventListener("click",()=>{location.hash="y"+b.dataset.y}));
+function yearFromHash(){const m=/^#y(\d{4})$/.exec(location.hash);return m?+m[1]:2027}
+addEventListener("hashchange",()=>setYear(yearFromHash()));
+setYear(yearFromHash());
+
+// ---- one-page PDF (A4 / A3) for printing, per selected year ----
+(async()=>{
+  const cl=window.claude; if(!cl||!cl.use)return;
+  const dl=await cl.use("downloads"); if(!dl)return;
+  const box=document.getElementById("dl"), msg=document.getElementById("dlMsg"); box.hidden=false;
+  box.querySelectorAll("button").forEach(b=>b.addEventListener("click",async()=>{
+    const name=b.dataset.eml?`${Y} AviusULD Calendar Email.zip`:b.dataset.ics?`${Y} AviusULD Calendar Outlook.zip`:`${Y} AviusULD Calendar ${b.dataset.size}.pdf`; msg.textContent="";
+    try{
+      const r=await fetch(b.dataset.eml?`cal/AviusULD_Calendar_${Y}_Email.eml.txt`:b.dataset.ics?`cal/AviusULD_Calendar_${Y}.ics.txt`:`pdf/AviusULD_Calendar_${Y}_${b.dataset.size}.pdf`); if(!r.ok)throw new Error("fetch");
+      let data=new Uint8Array(await r.arrayBuffer());
+      if(b.dataset.ics)data=zipOne(`${Y} AviusULD Calendar.ics`,data);
+      if(b.dataset.eml)data=zipOne(`${Y} AviusULD Calendar.eml`,data);
+      await dl.save({filename:name,data});
+      if(b.dataset.eml)msg.textContent="Unzip, then double-click the .eml file: Outlook opens it as a new email ready to send · แตกไฟล์ zip แล้วดับเบิลคลิกไฟล์ .eml Outlook จะเปิดเป็นอีเมลใหม่พร้อมส่ง";
+      else if(b.dataset.ics)msg.textContent="Unzip, then open the .ics file to add every date to Outlook · แตกไฟล์ zip แล้วเปิดไฟล์ .ics เพื่อเพิ่มทุกวันลงใน Outlook";
+    }catch(e){ if(!(e&&(e.code==="dismissed"||e.code==="declined")))msg.textContent="Couldn't download the file · ดาวน์โหลดไม่สำเร็จ"; }
+  }));
+})();
+
+// minimal one-file ZIP (stored, no compression) so the .ics can be saved through the viewer's download allowlist
+function zipOne(fname,bytes){
+  const crcT=zipOne.t||(zipOne.t=(()=>{const t=new Uint32Array(256);for(let n=0;n<256;n++){let c=n;for(let k=0;k<8;k++)c=c&1?0xEDB88320^(c>>>1):c>>>1;t[n]=c>>>0}return t})());
+  let crc=0xFFFFFFFF;for(const x of bytes)crc=crcT[(crc^x)&0xFF]^(crc>>>8);crc=(crc^0xFFFFFFFF)>>>0;
+  const nm=new TextEncoder().encode(fname),n=bytes.length;
+  const lh=new DataView(new ArrayBuffer(30));[[0,0x04034b50,4],[4,20,2],[6,0x0800,2],[8,0,2],[10,0,2],[12,0x21,2],[14,crc,4],[18,n,4],[22,n,4],[26,nm.length,2],[28,0,2]].forEach(([o,v,z])=>z===4?lh.setUint32(o,v,true):lh.setUint16(o,v,true));
+  const ch=new DataView(new ArrayBuffer(46));[[0,0x02014b50,4],[4,20,2],[6,20,2],[8,0x0800,2],[10,0,2],[12,0,2],[14,0x21,2],[16,crc,4],[20,n,4],[24,n,4],[28,nm.length,2],[30,0,2],[32,0,2],[34,0,2],[36,0,2],[38,0,4],[42,0,4]].forEach(([o,v,z])=>z===4?ch.setUint32(o,v,true):ch.setUint16(o,v,true));
+  const cdOff=30+nm.length+n, cdLen=46+nm.length;
+  const ed=new DataView(new ArrayBuffer(22));[[0,0x06054b50,4],[4,0,2],[6,0,2],[8,1,2],[10,1,2],[12,cdLen,4],[16,cdOff,4],[20,0,2]].forEach(([o,v,z])=>z===4?ed.setUint32(o,v,true):ed.setUint16(o,v,true));
+  const out=new Uint8Array(cdOff+cdLen+22);let o=0;
+  for(const part of [new Uint8Array(lh.buffer),nm,bytes,new Uint8Array(ch.buffer),nm,new Uint8Array(ed.buffer)]){out.set(part,o);o+=part.length}
+  return out;
+}
+
+// ---- "Email via Outlook": new message with the selected year's holidays and paydays as text ----
+function mailText(){
+  const o=Y===2027?OPTS["option-1"]:{comb:YEARS[Y].comb};
+  const L=[`AviusULD Calendar ${Y} · ปฏิทินบริษัท อาวียุส ยูแอลดี จำกัด ประจำปี ${YEARS[Y].be}`,"","Traditional Holidays · วันหยุดตามประเพณี"];
+  HOL.forEach((h,i)=>{const d=new Date(Y,h[0]-1,h[1]);L.push(`${i+1}. ${fmtEN(d)} - ${h[3]} · ${h[2]}`)});
+  L.push("","Combined Holidays · วันหยุดพักร้อนร่วม");
+  o.comb.forEach((c,i)=>{const d=new Date(Y,c[0]-1,c[1]);L.push(`${i+1}. ${fmtEN(d)} - ${c[2]==="s"?"Special Holiday · วันหยุดพิเศษ":"Combined Holiday · วันหยุดพักร้อนร่วม"}`)});
+  const pays=(YEARS[Y].pay||[]).map(x=>`${x[1]} ${MEN[x[0]-1].slice(0,3)}`);
+  L.push("","The salary will be paid as mention dated. · วันจ่ายเงินเดือน",pays.join(", "));
+  return L.join("\n");
+}
+function updMail(){const a=document.getElementById("olMail");if(!a)return;
+  const q=new URLSearchParams({subject:`AviusULD Calendar ${Y} · ปฏิทินบริษัท อาวียุส ยูแอลดี จำกัด ประจำปี ${YEARS[Y].be}`,body:mailText()});
+  a.href="https://outlook.office.com/mail/deeplink/compose?"+q.toString().replace(/\+/g,"%20");}
+updMail(); addEventListener("hashchange",()=>setTimeout(updMail,0));
+document.getElementById("dl")&&document.getElementById("dl").removeAttribute("data-nomail");
+
+// ---- CEO signature: 2027 only (approved by email, 23 November 2026). Drawn on a canvas with a faint
+// "AviusULD Calendar 2027" watermark across it; right-click, drag and selection are blocked on the block.
+const CEO_SIG="data:image/png;base64,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";
+const ceoImg=new Image(); ceoImg.src=CEO_SIG;
+function drawCeo(){
+  const cv=document.getElementById("ceoSig"); if(!cv)return;
+  const show=Y===2027&&!(window.__dbSigned); cv.style.display=show?"block":"none"; if(!show)return;
+  const go=()=>{const dpr=window.devicePixelRatio||2,w=260,h=70; cv.width=w*dpr; cv.height=h*dpr; const c=cv.getContext("2d"); c.scale(dpr,dpr); c.clearRect(0,0,w,h);
+    const k=Math.min((w-10)/ceoImg.width,(h-4)/ceoImg.height); c.drawImage(ceoImg,0,h-ceoImg.height*k-2,ceoImg.width*k,ceoImg.height*k);
+    placeCeo();};
+  ceoImg.complete?go():ceoImg.onload=go;
+}
+// start of the signature lines up with the "C" of "( Charles Drummond )"
+function placeCeo(){
+  const cv=document.getElementById("ceoSig"), nm=document.querySelector(".sign-name"); if(!cv||!nm)return;
+  const tw=document.createTreeWalker(nm,NodeFilter.SHOW_TEXT); let n,x=null;
+  while((n=tw.nextNode())){const i=n.textContent.indexOf("C"); if(i>=0){const r=document.createRange(); r.setStart(n,i); r.setEnd(n,i+1); x=r.getBoundingClientRect().left; break}}
+  if(x===null)return; cv.style.transform="none"; cv.style.left=(x-cv.parentElement.getBoundingClientRect().left)+"px";
+}
+addEventListener("resize",placeCeo); if(document.fonts&&document.fonts.ready)document.fonts.ready.then(placeCeo);
+const sgn=document.querySelector(".sign"); if(sgn){["contextmenu","dragstart","copy"].forEach(ev=>sgn.addEventListener(ev,e=>e.preventDefault()))}
+addEventListener("hashchange",()=>setTimeout(drawCeo,0)); drawCeo();
+</script>
+
+<script>
+// Public site: print one page with the browser, save the Outlook .ics directly.
+(function(){
+  const ICS={"2027": "BEGIN:VCALENDAR\nVERSION:2.0\nPRODID:-//AviusULD//Company Calendar//EN\nCALSCALE:GREGORIAN\nMETHOD:PUBLISH\nX-WR-CALNAME:AviusULD Calendar 2027\nX-WR-TIMEZONE:Asia/Bangkok\nBEGIN:VEVENT\nUID:20270101-hol@aviusuld-calendar\nDTSTAMP:20261121T034509Z\nDTSTART;VALUE=DATE:20270101\nDTEND;VALUE=DATE:20270102\nSUMMARY:New Year's Day · วันขึ้นปีใหม่ (AviusULD\n )\nTRANSP:TRANSPARENT\nCATEGORIES:Holiday\nX-MICROSOFT-CDO-BUSYSTATUS:FREE\nX-MICROSOFT-CDO-ALLDAYEVENT:TRUE\nEND:VEVENT\nBEGIN:VEVENT\nUID:20270128-pay@aviusuld-calendar\nDTSTAMP:20261121T034509Z\nDTSTART;VALUE=DATE:20270128\nDTEND;VALUE=DATE:20270129\nSUMMARY:Payday · วันจ่ายเงินเดือน (AviusUL\n D)\nTRANSP:TRANSPARENT\nCATEGORIES:Payday\nX-MICROSOFT-CDO-BUSYSTATUS:FREE\nX-MICROSOFT-CDO-ALLDAYEVENT:TRUE\nEND:VEVENT\nBEGIN:VEVENT\nUID:20270222-hol@aviusuld-calendar\nDTSTAMP:20261121T034509Z\nDTSTART;VALUE=DATE:20270222\nDTEND;VALUE=DATE:20270223\nSUMMARY:Substitute for Makha Bucha Day (Sun 21 Feb) · ชดเชยว\n ันมาฆบูชา (อา. 21 ก.พ.) (AviusULD)\nTRANSP:TRANSPARENT\nCATEGORIES:Holiday\nX-MICROSOFT-CDO-BUSYSTATUS:FREE\nX-MICROSOFT-CDO-ALLDAYEVENT:TRUE\nEND:VEVENT\nBEGIN:VEVENT\nUID:20270228-pay@aviusuld-calendar\nDTSTAMP:20261121T034509Z\nDTSTART;VALUE=DATE:20270228\nDTEND;VALUE=DATE:20270301\nSUMMARY:Payday · วันจ่ายเงินเดือน (AviusUL\n D)\nTRANSP:TRANSPARENT\nCATEGORIES:Payday\nX-MICROSOFT-CDO-BUSYSTATUS:FREE\nX-MICROSOFT-CDO-ALLDAYEVENT:TRUE\nEND:VEVENT\nBEGIN:VEVENT\nUID:20270328-pay@aviusuld-calendar\nDTSTAMP:20261121T034509Z\nDTSTART;VALUE=DATE:20270328\nDTEND;VALUE=DATE:20270329\nSUMMARY:Payday · วันจ่ายเงินเดือน (AviusUL\n D)\nTRANSP:TRANSPARENT\nCATEGORIES:Payday\nX-MICROSOFT-CDO-BUSYSTATUS:FREE\nX-MICROSOFT-CDO-ALLDAYEVENT:TRUE\nEND:VEVENT\nBEGIN:VEVENT\nUID:20270412-comb@aviusuld-calendar\nDTSTAMP:20261121T034509Z\nDTSTART;VALUE=DATE:20270412\nDTEND;VALUE=DATE:20270413\nSUMMARY:Combined Holiday · วันหยุดพักร้อนร\n ่วม (AviusULD)\nTRANSP:TRANSPARENT\nCATEGORIES:Holiday\nX-MICROSOFT-CDO-BUSYSTATUS:FREE\nX-MICROSOFT-CDO-ALLDAYEVENT:TRUE\nEND:VEVENT\nBEGIN:VEVENT\nUID:20270413-hol@aviusuld-calendar\nDTSTAMP:20261121T034509Z\nDTSTART;VALUE=DATE:20270413\nDTEND;VALUE=DATE:20270414\nSUMMARY:Songkran Festival · วันสงกรานต์ (AviusULD)\nTRANSP:TRANSPARENT\nCATEGORIES:Holiday\nX-MICROSOFT-CDO-BUSYSTATUS:FREE\nX-MICROSOFT-CDO-ALLDAYEVENT:TRUE\nEND:VEVENT\nBEGIN:VEVENT\nUID:20270414-hol@aviusuld-calendar\nDTSTAMP:20261121T034509Z\nDTSTART;VALUE=DATE:20270414\nDTEND;VALUE=DATE:20270415\nSUMMARY:Songkran Festival · วันสงกรานต์ (AviusULD)\nTRANSP:TRANSPARENT\nCATEGORIES:Holiday\nX-MICROSOFT-CDO-BUSYSTATUS:FREE\nX-MICROSOFT-CDO-ALLDAYEVENT:TRUE\nEND:VEVENT\nBEGIN:VEVENT\nUID:20270415-hol@aviusuld-calendar\nDTSTAMP:20261121T034509Z\nDTSTART;VALUE=DATE:20270415\nDTEND;VALUE=DATE:20270416\nSUMMARY:Songkran Festival · วันสงกรานต์ (AviusULD)\nTRANSP:TRANSPARENT\nCATEGORIES:Holiday\nX-MICROSOFT-CDO-BUSYSTATUS:FREE\nX-MICROSOFT-CDO-ALLDAYEVENT:TRUE\nEND:VEVENT\nBEGIN:VEVENT\nUID:20270416-comb@aviusuld-calendar\nDTSTAMP:20261121T034509Z\nDTSTART;VALUE=DATE:20270416\nDTEND;VALUE=DATE:20270417\nSUMMARY:Combined Holiday · วันหยุดพักร้อนร\n ่วม (AviusULD)\nTRANSP:TRANSPARENT\nCATEGORIES:Holiday\nX-MICROSOFT-CDO-BUSYSTATUS:FREE\nX-MICROSOFT-CDO-ALLDAYEVENT:TRUE\nEND:VEVENT\nBEGIN:VEVENT\nUID:20270428-pay@aviusuld-calendar\nDTSTAMP:20261121T034509Z\nDTSTART;VALUE=DATE:20270428\nDTEND;VALUE=DATE:20270429\nSUMMARY:Payday · วันจ่ายเงินเดือน (AviusUL\n D)\nTRANSP:TRANSPARENT\nCATEGORIES:Payday\nX-MICROSOFT-CDO-BUSYSTATUS:FREE\nX-MICROSOFT-CDO-ALLDAYEVENT:TRUE\nEND:VEVENT\nBEGIN:VEVENT\nUID:20270503-hol@aviusuld-calendar\nDTSTAMP:20261121T034509Z\nDTSTART;VALUE=DATE:20270503\nDTEND;VALUE=DATE:20270504\nSUMMARY:Substitute for National Labour Day (Sat 1 May) · ชดเชย\n วันแรงงานแห่งชาติ (ส. 1 พ.ค.) (Avi\n usULD)\nTRANSP:TRANSPARENT\nCATEGORIES:Holiday\nX-MICROSOFT-CDO-BUSYSTATUS:FREE\nX-MICROSOFT-CDO-ALLDAYEVENT:TRUE\nEND:VEVENT\nBEGIN:VEVENT\nUID:20270528-pay@aviusuld-calendar\nDTSTAMP:20261121T034509Z\nDTSTART;VALUE=DATE:20270528\nDTEND;VALUE=DATE:20270529\nSUMMARY:Payday · วันจ่ายเงินเดือน (AviusUL\n D)\nTRANSP:TRANSPARENT\nCATEGORIES:Payday\nX-MICROSOFT-CDO-BUSYSTATUS:FREE\nX-MICROSOFT-CDO-ALLDAYEVENT:TRUE\nEND:VEVENT\nBEGIN:VEVENT\nUID:20270603-hol@aviusuld-calendar\nDTSTAMP:20261121T034509Z\nDTSTART;VALUE=DATE:20270603\nDTEND;VALUE=DATE:20270604\nSUMMARY:H.M. Queen Suthida's Birthday · วันเฉลิมพระ\n ชนมพรรษาสมเด็จพระนางเจ้า\n ฯ พระบรมราชินี (AviusULD)\nTRANSP:TRANSPARENT\nCATEGORIES:Holiday\nX-MICROSOFT-CDO-BUSYSTATUS:FREE\nX-MICROSOFT-CDO-ALLDAYEVENT:TRUE\nEND:VEVENT\nBEGIN:VEVENT\nUID:20270628-pay@aviusuld-calendar\nDTSTAMP:20261121T034509Z\nDTSTART;VALUE=DATE:20270628\nDTEND;VALUE=DATE:20270629\nSUMMARY:Payday · วันจ่ายเงินเดือน (AviusUL\n D)\nTRANSP:TRANSPARENT\nCATEGORIES:Payday\nX-MICROSOFT-CDO-BUSYSTATUS:FREE\nX-MICROSOFT-CDO-ALLDAYEVENT:TRUE\nEND:VEVENT\nBEGIN:VEVENT\nUID:20270719-hol@aviusuld-calendar\nDTSTAMP:20261121T034509Z\nDTSTART;VALUE=DATE:20270719\nDTEND;VALUE=DATE:20270720\nSUMMARY:Substitute for Asarnha Bucha Day (Sun 18 Jul) · ชดเชยว\n ันอาสาฬหบูชา (อา. 18 ก.ค.) (AviusULD)\nTRANSP:TRANSPARENT\nCATEGORIES:Holiday\nX-MICROSOFT-CDO-BUSYSTATUS:FREE\nX-MICROSOFT-CDO-ALLDAYEVENT:TRUE\nEND:VEVENT\nBEGIN:VEVENT\nUID:20270728-hol@aviusuld-calendar\nDTSTAMP:20261121T034509Z\nDTSTART;VALUE=DATE:20270728\nDTEND;VALUE=DATE:20270729\nSUMMARY:H.M. King Rama X's Birthday · วันเฉลิมพระช\n นมพรรษา รัชกาลที่ 10 (AviusULD)\nTRANSP:TRANSPARENT\nCATEGORIES:Holiday\nX-MICROSOFT-CDO-BUSYSTATUS:FREE\nX-MICROSOFT-CDO-ALLDAYEVENT:TRUE\nEND:VEVENT\nBEGIN:VEVENT\nUID:20270728-pay@aviusuld-calendar\nDTSTAMP:20261121T034509Z\nDTSTART;VALUE=DATE:20270728\nDTEND;VALUE=DATE:20270729\nSUMMARY:Payday · วันจ่ายเงินเดือน (AviusUL\n D)\nTRANSP:TRANSPARENT\nCATEGORIES:Payday\nX-MICROSOFT-CDO-BUSYSTATUS:FREE\nX-MICROSOFT-CDO-ALLDAYEVENT:TRUE\nEND:VEVENT\nBEGIN:VEVENT\nUID:20270812-hol@aviusuld-calendar\nDTSTAMP:20261121T034509Z\nDTSTART;VALUE=DATE:20270812\nDTEND;VALUE=DATE:20270813\nSUMMARY:National Mother's Day · วันแม่แห่งชาติ\n  (AviusULD)\nTRANSP:TRANSPARENT\nCATEGORIES:Holiday\nX-MICROSOFT-CDO-BUSYSTATUS:FREE\nX-MICROSOFT-CDO-ALLDAYEVENT:TRUE\nEND:VEVENT\nBEGIN:VEVENT\nUID:20270828-pay@aviusuld-calendar\nDTSTAMP:20261121T034509Z\nDTSTART;VALUE=DATE:20270828\nDTEND;VALUE=DATE:20270829\nSUMMARY:Payday · วันจ่ายเงินเดือน (AviusUL\n D)\nTRANSP:TRANSPARENT\nCATEGORIES:Payday\nX-MICROSOFT-CDO-BUSYSTATUS:FREE\nX-MICROSOFT-CDO-ALLDAYEVENT:TRUE\nEND:VEVENT\nBEGIN:VEVENT\nUID:20270928-pay@aviusuld-calendar\nDTSTAMP:20261121T034509Z\nDTSTART;VALUE=DATE:20270928\nDTEND;VALUE=DATE:20270929\nSUMMARY:Payday · วันจ่ายเงินเดือน (AviusUL\n D)\nTRANSP:TRANSPARENT\nCATEGORIES:Payday\nX-MICROSOFT-CDO-BUSYSTATUS:FREE\nX-MICROSOFT-CDO-ALLDAYEVENT:TRUE\nEND:VEVENT\nBEGIN:VEVENT\nUID:20271013-hol@aviusuld-calendar\nDTSTAMP:20261121T034509Z\nDTSTART;VALUE=DATE:20271013\nDTEND;VALUE=DATE:20271014\nSUMMARY:King Rama IX Memorial Day · วันนวมินทรมห\n าราช (AviusULD)\nTRANSP:TRANSPARENT\nCATEGORIES:Holiday\nX-MICROSOFT-CDO-BUSYSTATUS:FREE\nX-MICROSOFT-CDO-ALLDAYEVENT:TRUE\nEND:VEVENT\nBEGIN:VEVENT\nUID:20271028-pay@aviusuld-calendar\nDTSTAMP:20261121T034509Z\nDTSTART;VALUE=DATE:20271028\nDTEND;VALUE=DATE:20271029\nSUMMARY:Payday · วันจ่ายเงินเดือน (AviusUL\n D)\nTRANSP:TRANSPARENT\nCATEGORIES:Payday\nX-MICROSOFT-CDO-BUSYSTATUS:FREE\nX-MICROSOFT-CDO-ALLDAYEVENT:TRUE\nEND:VEVENT\nBEGIN:VEVENT\nUID:20271128-pay@aviusuld-calendar\nDTSTAMP:20261121T034509Z\nDTSTART;VALUE=DATE:20271128\nDTEND;VALUE=DATE:20271129\nSUMMARY:Payday · วันจ่ายเงินเดือน (AviusUL\n D)\nTRANSP:TRANSPARENT\nCATEGORIES:Payday\nX-MICROSOFT-CDO-BUSYSTATUS:FREE\nX-MICROSOFT-CDO-ALLDAYEVENT:TRUE\nEND:VEVENT\nBEGIN:VEVENT\nUID:20271206-hol@aviusuld-calendar\nDTSTAMP:20261121T034509Z\nDTSTART;VALUE=DATE:20271206\nDTEND;VALUE=DATE:20271207\nSUMMARY:Substitute for National Father's Day (Sun 5 Dec) · ชดเชย\n วันพ่อแห่งชาติ (อา. 5 ธ.ค.) (AviusULD)\nTRANSP:TRANSPARENT\nCATEGORIES:Holiday\nX-MICROSOFT-CDO-BUSYSTATUS:FREE\nX-MICROSOFT-CDO-ALLDAYEVENT:TRUE\nEND:VEVENT\nBEGIN:VEVENT\nUID:20271227-pay@aviusuld-calendar\nDTSTAMP:20261121T034509Z\nDTSTART;VALUE=DATE:20271227\nDTEND;VALUE=DATE:20271228\nSUMMARY:Payday · วันจ่ายเงินเดือน (AviusUL\n D)\nTRANSP:TRANSPARENT\nCATEGORIES:Payday\nX-MICROSOFT-CDO-BUSYSTATUS:FREE\nX-MICROSOFT-CDO-ALLDAYEVENT:TRUE\nEND:VEVENT\nBEGIN:VEVENT\nUID:20271228-comb@aviusuld-calendar\nDTSTAMP:20261121T034509Z\nDTSTART;VALUE=DATE:20271228\nDTEND;VALUE=DATE:20271229\nSUMMARY:Combined Holiday · วันหยุดพักร้อนร\n ่วม (AviusULD)\nTRANSP:TRANSPARENT\nCATEGORIES:Holiday\nX-MICROSOFT-CDO-BUSYSTATUS:FREE\nX-MICROSOFT-CDO-ALLDAYEVENT:TRUE\nEND:VEVENT\nBEGIN:VEVENT\nUID:20271229-comb@aviusuld-calendar\nDTSTAMP:20261121T034509Z\nDTSTART;VALUE=DATE:20271229\nDTEND;VALUE=DATE:20271230\nSUMMARY:Combined Holiday · วันหยุดพักร้อนร\n ่วม (AviusULD)\nTRANSP:TRANSPARENT\nCATEGORIES:Holiday\nX-MICROSOFT-CDO-BUSYSTATUS:FREE\nX-MICROSOFT-CDO-ALLDAYEVENT:TRUE\nEND:VEVENT\nBEGIN:VEVENT\nUID:20271230-comb@aviusuld-calendar\nDTSTAMP:20261121T034509Z\nDTSTART;VALUE=DATE:20271230\nDTEND;VALUE=DATE:20271231\nSUMMARY:Combined Holiday · วันหยุดพักร้อนร\n ่วม (AviusULD)\nTRANSP:TRANSPARENT\nCATEGORIES:Holiday\nX-MICROSOFT-CDO-BUSYSTATUS:FREE\nX-MICROSOFT-CDO-ALLDAYEVENT:TRUE\nEND:VEVENT\nBEGIN:VEVENT\nUID:20271231-hol@aviusuld-calendar\nDTSTAMP:20261121T034509Z\nDTSTART;VALUE=DATE:20271231\nDTEND;VALUE=DATE:20280101\nSUMMARY:New Year's Eve · วันสิ้นปี (AviusULD)\nTRANSP:TRANSPARENT\nCATEGORIES:Holiday\nX-MICROSOFT-CDO-BUSYSTATUS:FREE\nX-MICROSOFT-CDO-ALLDAYEVENT:TRUE\nEND:VEVENT\nEND:VCALENDAR\n", "2026": "BEGIN:VCALENDAR\nVERSION:2.0\nPRODID:-//AviusULD//Company Calendar//EN\nCALSCALE:GREGORIAN\nMETHOD:PUBLISH\nX-WR-CALNAME:AviusULD Calendar 2026\nX-WR-TIMEZONE:Asia/Bangkok\nBEGIN:VEVENT\nUID:20260101-hol@aviusuld-calendar\nDTSTAMP:20261121T034510Z\nDTSTART;VALUE=DATE:20260101\nDTEND;VALUE=DATE:20260102\nSUMMARY:New Year's Day · วันขึ้นปีใหม่ (AviusULD\n )\nTRANSP:TRANSPARENT\nCATEGORIES:Holiday\nX-MICROSOFT-CDO-BUSYSTATUS:FREE\nX-MICROSOFT-CDO-ALLDAYEVENT:TRUE\nEND:VEVENT\nBEGIN:VEVENT\nUID:20260102-comb@aviusuld-calendar\nDTSTAMP:20261121T034510Z\nDTSTART;VALUE=DATE:20260102\nDTEND;VALUE=DATE:20260103\nSUMMARY:Special Holiday · วันหยุดพิเศษ (AviusULD)\nTRANSP:TRANSPARENT\nCATEGORIES:Holiday\nX-MICROSOFT-CDO-BUSYSTATUS:FREE\nX-MICROSOFT-CDO-ALLDAYEVENT:TRUE\nEND:VEVENT\nBEGIN:VEVENT\nUID:20260128-pay@aviusuld-calendar\nDTSTAMP:20261121T034510Z\nDTSTART;VALUE=DATE:20260128\nDTEND;VALUE=DATE:20260129\nSUMMARY:Payday · วันจ่ายเงินเดือน (AviusUL\n D)\nTRANSP:TRANSPARENT\nCATEGORIES:Payday\nX-MICROSOFT-CDO-BUSYSTATUS:FREE\nX-MICROSOFT-CDO-ALLDAYEVENT:TRUE\nEND:VEVENT\nBEGIN:VEVENT\nUID:20260228-pay@aviusuld-calendar\nDTSTAMP:20261121T034510Z\nDTSTART;VALUE=DATE:20260228\nDTEND;VALUE=DATE:20260301\nSUMMARY:Payday · วันจ่ายเงินเดือน (AviusUL\n D)\nTRANSP:TRANSPARENT\nCATEGORIES:Payday\nX-MICROSOFT-CDO-BUSYSTATUS:FREE\nX-MICROSOFT-CDO-ALLDAYEVENT:TRUE\nEND:VEVENT\nBEGIN:VEVENT\nUID:20260303-hol@aviusuld-calendar\nDTSTAMP:20261121T034510Z\nDTSTART;VALUE=DATE:20260303\nDTEND;VALUE=DATE:20260304\nSUMMARY:Makha Bucha Day · วันมาฆบูชา (AviusULD)\nTRANSP:TRANSPARENT\nCATEGORIES:Holiday\nX-MICROSOFT-CDO-BUSYSTATUS:FREE\nX-MICROSOFT-CDO-ALLDAYEVENT:TRUE\nEND:VEVENT\nBEGIN:VEVENT\nUID:20260328-pay@aviusuld-calendar\nDTSTAMP:20261121T034510Z\nDTSTART;VALUE=DATE:20260328\nDTEND;VALUE=DATE:20260329\nSUMMARY:Payday · วันจ่ายเงินเดือน (AviusUL\n D)\nTRANSP:TRANSPARENT\nCATEGORIES:Payday\nX-MICROSOFT-CDO-BUSYSTATUS:FREE\nX-MICROSOFT-CDO-ALLDAYEVENT:TRUE\nEND:VEVENT\nBEGIN:VEVENT\nUID:20260413-hol@aviusuld-calendar\nDTSTAMP:20261121T034510Z\nDTSTART;VALUE=DATE:20260413\nDTEND;VALUE=DATE:20260414\nSUMMARY:Songkran Festival · วันสงกรานต์ (AviusULD)\nTRANSP:TRANSPARENT\nCATEGORIES:Holiday\nX-MICROSOFT-CDO-BUSYSTATUS:FREE\nX-MICROSOFT-CDO-ALLDAYEVENT:TRUE\nEND:VEVENT\nBEGIN:VEVENT\nUID:20260414-hol@aviusuld-calendar\nDTSTAMP:20261121T034510Z\nDTSTART;VALUE=DATE:20260414\nDTEND;VALUE=DATE:20260415\nSUMMARY:Songkran Festival · วันสงกรานต์ (AviusULD)\nTRANSP:TRANSPARENT\nCATEGORIES:Holiday\nX-MICROSOFT-CDO-BUSYSTATUS:FREE\nX-MICROSOFT-CDO-ALLDAYEVENT:TRUE\nEND:VEVENT\nBEGIN:VEVENT\nUID:20260415-hol@aviusuld-calendar\nDTSTAMP:20261121T034510Z\nDTSTART;VALUE=DATE:20260415\nDTEND;VALUE=DATE:20260416\nSUMMARY:Songkran Festival · วันสงกรานต์ (AviusULD)\nTRANSP:TRANSPARENT\nCATEGORIES:Holiday\nX-MICROSOFT-CDO-BUSYSTATUS:FREE\nX-MICROSOFT-CDO-ALLDAYEVENT:TRUE\nEND:VEVENT\nBEGIN:VEVENT\nUID:20260416-comb@aviusuld-calendar\nDTSTAMP:20261121T034510Z\nDTSTART;VALUE=DATE:20260416\nDTEND;VALUE=DATE:20260417\nSUMMARY:Combined Holiday · วันหยุดพักร้อนร\n ่วม (AviusULD)\nTRANSP:TRANSPARENT\nCATEGORIES:Holiday\nX-MICROSOFT-CDO-BUSYSTATUS:FREE\nX-MICROSOFT-CDO-ALLDAYEVENT:TRUE\nEND:VEVENT\nBEGIN:VEVENT\nUID:20260417-comb@aviusuld-calendar\nDTSTAMP:20261121T034510Z\nDTSTART;VALUE=DATE:20260417\nDTEND;VALUE=DATE:20260418\nSUMMARY:Combined Holiday · วันหยุดพักร้อนร\n ่วม (AviusULD)\nTRANSP:TRANSPARENT\nCATEGORIES:Holiday\nX-MICROSOFT-CDO-BUSYSTATUS:FREE\nX-MICROSOFT-CDO-ALLDAYEVENT:TRUE\nEND:VEVENT\nBEGIN:VEVENT\nUID:20260428-pay@aviusuld-calendar\nDTSTAMP:20261121T034510Z\nDTSTART;VALUE=DATE:20260428\nDTEND;VALUE=DATE:20260429\nSUMMARY:Payday · วันจ่ายเงินเดือน (AviusUL\n D)\nTRANSP:TRANSPARENT\nCATEGORIES:Payday\nX-MICROSOFT-CDO-BUSYSTATUS:FREE\nX-MICROSOFT-CDO-ALLDAYEVENT:TRUE\nEND:VEVENT\nBEGIN:VEVENT\nUID:20260501-hol@aviusuld-calendar\nDTSTAMP:20261121T034510Z\nDTSTART;VALUE=DATE:20260501\nDTEND;VALUE=DATE:20260502\nSUMMARY:National Labour Day · วันแรงงานแห่งช\n าติ (AviusULD)\nTRANSP:TRANSPARENT\nCATEGORIES:Holiday\nX-MICROSOFT-CDO-BUSYSTATUS:FREE\nX-MICROSOFT-CDO-ALLDAYEVENT:TRUE\nEND:VEVENT\nBEGIN:VEVENT\nUID:20260528-pay@aviusuld-calendar\nDTSTAMP:20261121T034510Z\nDTSTART;VALUE=DATE:20260528\nDTEND;VALUE=DATE:20260529\nSUMMARY:Payday · วันจ่ายเงินเดือน (AviusUL\n D)\nTRANSP:TRANSPARENT\nCATEGORIES:Payday\nX-MICROSOFT-CDO-BUSYSTATUS:FREE\nX-MICROSOFT-CDO-ALLDAYEVENT:TRUE\nEND:VEVENT\nBEGIN:VEVENT\nUID:20260603-hol@aviusuld-calendar\nDTSTAMP:20261121T034510Z\nDTSTART;VALUE=DATE:20260603\nDTEND;VALUE=DATE:20260604\nSUMMARY:H.M. Queen Suthida's Birthday · วันเฉลิมพระ\n ชนมพรรษาสมเด็จพระนางเจ้า\n ฯ พระบรมราชินี (AviusULD)\nTRANSP:TRANSPARENT\nCATEGORIES:Holiday\nX-MICROSOFT-CDO-BUSYSTATUS:FREE\nX-MICROSOFT-CDO-ALLDAYEVENT:TRUE\nEND:VEVENT\nBEGIN:VEVENT\nUID:20260628-pay@aviusuld-calendar\nDTSTAMP:20261121T034510Z\nDTSTART;VALUE=DATE:20260628\nDTEND;VALUE=DATE:20260629\nSUMMARY:Payday · วันจ่ายเงินเดือน (AviusUL\n D)\nTRANSP:TRANSPARENT\nCATEGORIES:Payday\nX-MICROSOFT-CDO-BUSYSTATUS:FREE\nX-MICROSOFT-CDO-ALLDAYEVENT:TRUE\nEND:VEVENT\nBEGIN:VEVENT\nUID:20260728-hol@aviusuld-calendar\nDTSTAMP:20261121T034510Z\nDTSTART;VALUE=DATE:20260728\nDTEND;VALUE=DATE:20260729\nSUMMARY:H.M. King Rama X's Birthday · วันเฉลิมพระช\n นมพรรษา รัชกาลที่ 10 (AviusULD)\nTRANSP:TRANSPARENT\nCATEGORIES:Holiday\nX-MICROSOFT-CDO-BUSYSTATUS:FREE\nX-MICROSOFT-CDO-ALLDAYEVENT:TRUE\nEND:VEVENT\nBEGIN:VEVENT\nUID:20260728-pay@aviusuld-calendar\nDTSTAMP:20261121T034510Z\nDTSTART;VALUE=DATE:20260728\nDTEND;VALUE=DATE:20260729\nSUMMARY:Payday · วันจ่ายเงินเดือน (AviusUL\n D)\nTRANSP:TRANSPARENT\nCATEGORIES:Payday\nX-MICROSOFT-CDO-BUSYSTATUS:FREE\nX-MICROSOFT-CDO-ALLDAYEVENT:TRUE\nEND:VEVENT\nBEGIN:VEVENT\nUID:20260729-hol@aviusuld-calendar\nDTSTAMP:20261121T034510Z\nDTSTART;VALUE=DATE:20260729\nDTEND;VALUE=DATE:20260730\nSUMMARY:Asarnha Bucha Day · วันอาสาฬหบูชา (Avius\n ULD)\nTRANSP:TRANSPARENT\nCATEGORIES:Holiday\nX-MICROSOFT-CDO-BUSYSTATUS:FREE\nX-MICROSOFT-CDO-ALLDAYEVENT:TRUE\nEND:VEVENT\nBEGIN:VEVENT\nUID:20260812-hol@aviusuld-calendar\nDTSTAMP:20261121T034510Z\nDTSTART;VALUE=DATE:20260812\nDTEND;VALUE=DATE:20260813\nSUMMARY:National Mother's Day · วันแม่แห่งชาติ\n  (AviusULD)\nTRANSP:TRANSPARENT\nCATEGORIES:Holiday\nX-MICROSOFT-CDO-BUSYSTATUS:FREE\nX-MICROSOFT-CDO-ALLDAYEVENT:TRUE\nEND:VEVENT\nBEGIN:VEVENT\nUID:20260828-pay@aviusuld-calendar\nDTSTAMP:20261121T034510Z\nDTSTART;VALUE=DATE:20260828\nDTEND;VALUE=DATE:20260829\nSUMMARY:Payday · วันจ่ายเงินเดือน (AviusUL\n D)\nTRANSP:TRANSPARENT\nCATEGORIES:Payday\nX-MICROSOFT-CDO-BUSYSTATUS:FREE\nX-MICROSOFT-CDO-ALLDAYEVENT:TRUE\nEND:VEVENT\nBEGIN:VEVENT\nUID:20260928-pay@aviusuld-calendar\nDTSTAMP:20261121T034510Z\nDTSTART;VALUE=DATE:20260928\nDTEND;VALUE=DATE:20260929\nSUMMARY:Payday · วันจ่ายเงินเดือน (AviusUL\n D)\nTRANSP:TRANSPARENT\nCATEGORIES:Payday\nX-MICROSOFT-CDO-BUSYSTATUS:FREE\nX-MICROSOFT-CDO-ALLDAYEVENT:TRUE\nEND:VEVENT\nBEGIN:VEVENT\nUID:20261013-hol@aviusuld-calendar\nDTSTAMP:20261121T034510Z\nDTSTART;VALUE=DATE:20261013\nDTEND;VALUE=DATE:20261014\nSUMMARY:King Rama IX Memorial Day · วันนวมินทรมห\n าราช (AviusULD)\nTRANSP:TRANSPARENT\nCATEGORIES:Holiday\nX-MICROSOFT-CDO-BUSYSTATUS:FREE\nX-MICROSOFT-CDO-ALLDAYEVENT:TRUE\nEND:VEVENT\nBEGIN:VEVENT\nUID:20261028-pay@aviusuld-calendar\nDTSTAMP:20261121T034510Z\nDTSTART;VALUE=DATE:20261028\nDTEND;VALUE=DATE:20261029\nSUMMARY:Payday · วันจ่ายเงินเดือน (AviusUL\n D)\nTRANSP:TRANSPARENT\nCATEGORIES:Payday\nX-MICROSOFT-CDO-BUSYSTATUS:FREE\nX-MICROSOFT-CDO-ALLDAYEVENT:TRUE\nEND:VEVENT\nBEGIN:VEVENT\nUID:20261128-pay@aviusuld-calendar\nDTSTAMP:20261121T034510Z\nDTSTART;VALUE=DATE:20261128\nDTEND;VALUE=DATE:20261129\nSUMMARY:Payday · วันจ่ายเงินเดือน (AviusUL\n D)\nTRANSP:TRANSPARENT\nCATEGORIES:Payday\nX-MICROSOFT-CDO-BUSYSTATUS:FREE\nX-MICROSOFT-CDO-ALLDAYEVENT:TRUE\nEND:VEVENT\nBEGIN:VEVENT\nUID:20261207-hol@aviusuld-calendar\nDTSTAMP:20261121T034510Z\nDTSTART;VALUE=DATE:20261207\nDTEND;VALUE=DATE:20261208\nSUMMARY:Substitute for National Father's Day (Sun 5 Dec) · ชดเชย\n วันพ่อแห่งชาติ (อา. 5 ธ.ค.) (AviusULD)\nTRANSP:TRANSPARENT\nCATEGORIES:Holiday\nX-MICROSOFT-CDO-BUSYSTATUS:FREE\nX-MICROSOFT-CDO-ALLDAYEVENT:TRUE\nEND:VEVENT\nBEGIN:VEVENT\nUID:20261225-pay@aviusuld-calendar\nDTSTAMP:20261121T034510Z\nDTSTART;VALUE=DATE:20261225\nDTEND;VALUE=DATE:20261226\nSUMMARY:Payday · วันจ่ายเงินเดือน (AviusUL\n D)\nTRANSP:TRANSPARENT\nCATEGORIES:Payday\nX-MICROSOFT-CDO-BUSYSTATUS:FREE\nX-MICROSOFT-CDO-ALLDAYEVENT:TRUE\nEND:VEVENT\nBEGIN:VEVENT\nUID:20261228-comb@aviusuld-calendar\nDTSTAMP:20261121T034510Z\nDTSTART;VALUE=DATE:20261228\nDTEND;VALUE=DATE:20261229\nSUMMARY:Combined Holiday · วันหยุดพักร้อนร\n ่วม (AviusULD)\nTRANSP:TRANSPARENT\nCATEGORIES:Holiday\nX-MICROSOFT-CDO-BUSYSTATUS:FREE\nX-MICROSOFT-CDO-ALLDAYEVENT:TRUE\nEND:VEVENT\nBEGIN:VEVENT\nUID:20261229-comb@aviusuld-calendar\nDTSTAMP:20261121T034510Z\nDTSTART;VALUE=DATE:20261229\nDTEND;VALUE=DATE:20261230\nSUMMARY:Combined Holiday · วันหยุดพักร้อนร\n ่วม (AviusULD)\nTRANSP:TRANSPARENT\nCATEGORIES:Holiday\nX-MICROSOFT-CDO-BUSYSTATUS:FREE\nX-MICROSOFT-CDO-ALLDAYEVENT:TRUE\nEND:VEVENT\nBEGIN:VEVENT\nUID:20261230-comb@aviusuld-calendar\nDTSTAMP:20261121T034510Z\nDTSTART;VALUE=DATE:20261230\nDTEND;VALUE=DATE:20261231\nSUMMARY:Combined Holiday · วันหยุดพักร้อนร\n ่วม (AviusULD)\nTRANSP:TRANSPARENT\nCATEGORIES:Holiday\nX-MICROSOFT-CDO-BUSYSTATUS:FREE\nX-MICROSOFT-CDO-ALLDAYEVENT:TRUE\nEND:VEVENT\nBEGIN:VEVENT\nUID:20261231-hol@aviusuld-calendar\nDTSTAMP:20261121T034510Z\nDTSTART;VALUE=DATE:20261231\nDTEND;VALUE=DATE:20270101\nSUMMARY:New Year's Eve · วันสิ้นปี (AviusULD)\nTRANSP:TRANSPARENT\nCATEGORIES:Holiday\nX-MICROSOFT-CDO-BUSYSTATUS:FREE\nX-MICROSOFT-CDO-ALLDAYEVENT:TRUE\nEND:VEVENT\nEND:VCALENDAR\n"}, ZOOM={A4:0.48,A3:0.69};
+  const box=document.getElementById("dl"), msg=document.getElementById("dlMsg"); if(!box)return; box.hidden=false;
+  const ps=document.createElement("style"); document.head.appendChild(ps);
+  box.querySelectorAll("button").forEach(b=>b.addEventListener("click",()=>{
+    msg.textContent="";
+    if(b.dataset.ics){const a=document.createElement("a");a.href=URL.createObjectURL(new Blob([ICS[Y]],{type:"text/calendar"}));a.download=Y+" AviusULD Calendar.ics";document.body.appendChild(a);a.click();a.remove();
+      msg.textContent="Open the .ics file to add every date to Outlook · เปิดไฟล์ .ics เพื่อเพิ่มทุกวันลงใน Outlook";return}
+    ps.textContent="@page{size:"+b.dataset.size+" portrait;margin:6mm}@media print{html{zoom:"+ZOOM[b.dataset.size]+"}.wrap{max-width:none!important}.ypick,.dl,.olc{display:none!important}.months{grid-template-columns:repeat(4,minmax(0,1fr))!important}.lists{grid-template-columns:minmax(0,1.25fr) minmax(0,1fr)!important}.legend{grid-template-columns:repeat(4,minmax(0,1fr))!important}footer .wrap{grid-template-columns:minmax(0,1fr) auto!important}header.band .wrap.hdr{grid-template-columns:1fr auto 1fr!important}*{-webkit-print-color-adjust:exact;print-color-adjust:exact}}";
+    setTimeout(()=>{if(typeof alignSign==="function")alignSign();window.print()},50);
+  }),true);
+})();
+</script>
+</body>
+</html>
