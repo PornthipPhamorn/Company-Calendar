@@ -526,6 +526,18 @@ function placeCeo(){
 addEventListener("resize",placeCeo); if(document.fonts&&document.fonts.ready)document.fonts.ready.then(placeCeo);
 const sgn=document.querySelector(".sign"); if(sgn){["contextmenu","dragstart","copy"].forEach(ev=>sgn.addEventListener(ev,e=>e.preventDefault()))}
 addEventListener("hashchange",()=>setTimeout(drawCeo,0)); drawCeo();
+
+// ---- footer: keep the English sentence and the Thai sentence on one line each (shrink to fit, wrap only on small screens)
+function fitFooter(){
+  const box=document.querySelector("footer .ft-text"); if(!box)return;
+  const ds=[...box.children].slice(0,3), base=[15,16,15];
+  let k=1;
+  ds.forEach((d,i)=>{d.style.whiteSpace="nowrap";d.style.fontSize=base[i]+"px";k=Math.min(k,(box.clientWidth-2)/d.scrollWidth)});
+  if(k<0.72){ds.forEach((d,i)=>{d.style.whiteSpace="normal";d.style.fontSize=base[i]+"px"});return}  // small screens: wrap instead
+  ds.forEach((d,i)=>{d.style.fontSize=(base[i]*k).toFixed(2)+"px"});
+}
+fitFooter(); addEventListener("resize",fitFooter); addEventListener("hashchange",()=>setTimeout(fitFooter,0));
+if(document.fonts&&document.fonts.ready)document.fonts.ready.then(fitFooter);
 </script>
 
 <script>
