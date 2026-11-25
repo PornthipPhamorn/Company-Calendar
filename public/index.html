@@ -350,7 +350,17 @@ const fmtTH=d=>`${DTH[d.getDay()]}ที่ ${d.getDate()} ${MTH[d.getMonth()]} 
 const fmtEN=d=>`${DEN[d.getDay()]}, ${d.getDate()} ${MEN[d.getMonth()]} ${d.getFullYear()}`;
 // week number: weeks run Sunday–Saturday, wk1 = week containing 1 January (same as the Excel calendar)
 let JAN1=new Date(Y,0,1).getDay();
-const wkNo=d=>Math.floor((Math.round((d-new Date(Y,0,1))/864e5)+JAN1)/7)+1;
+// Wk1 = first full Sunday-to-Saturday week of the year; days before it carry the previous year's last week number
+function wkOf(d){
+  const y=d.getFullYear(), j1=new Date(y,0,1), off=j1.getDay();
+  if(y<2027)return Math.floor((Math.round((d-j1)/864e5)+off)/7)+1;  // 2026 keeps the numbering of the signed 2026 calendar
+  const n=Math.floor((Math.round((d-j1)/864e5)+off)/7)+(off===0?1:0);
+  if(n>0)return n;
+  // partial first week keeps the number the previous year's calendar gave its last week (e.g. 27 Dec 2026 - 2 Jan 2027 = Wk53)
+  const pj=new Date(y-1,0,1), last=new Date(y-1,11,31);
+  return Math.floor((Math.round((last-pj)/864e5)+pj.getDay())/7)+1;
+}
+const wkNo=d=>wkOf(d);
 
 // Outlook on the web: opens a new all-day event, prefilled
 const ymd=d=>`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`;
