@@ -385,10 +385,10 @@ function render(id){
   let html="";
   for(let m=0;m<12;m++){
     const first=new Date(Y,m,1).getDay(), n=new Date(Y,m+1,0).getDate();
-    let cells='<div class="dow"></div>'+DOW.map(x=>`<div class="dow">${x}</div>`).join("")+`<div class="wk">wk${wkNo(new Date(Y,m,1))}</div>`+"<div></div>".repeat(first);
+    let cells='<div class="dow"></div>'+DOW.map(x=>`<div class="dow">${x}</div>`).join("")+`<div class="wk">Wk${wkNo(new Date(Y,m,1))}</div>`+"<div></div>".repeat(first);
     for(let d=1;d<=n;d++){
       const dt=new Date(Y,m,d),k=key(m+1,d),h=holMap.get(k),c=combMap.get(k);
-      if(d>1&&dt.getDay()===0)cells+=`<div class="wk">wk${wkNo(dt)}</div>`;
+      if(d>1&&dt.getDay()===0)cells+=`<div class="wk">Wk${wkNo(dt)}</div>`;
       let cls="d",tip="";
       if(h){cls+=" hol";tip=h[3]+" · "+h[2];if(payMap.has(k)){cls+=" paysplit";tip+=" + Payday · วันจ่ายเงินเดือน"}}
       else if(c==="c"){cls+=" comb";tip="Combined Holiday · วันหยุดพักร้อนร่วม";if(payMap.has(k)){cls+=" paysplit";tip+=" + Payday · วันจ่ายเงินเดือน"}}
